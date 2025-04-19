@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAlways] //Always, since we might want to record the synthesis process in-game
 public class Tile : MonoBehaviour
 {
     [SerializeField] private List<Tile> allowedAboveList;

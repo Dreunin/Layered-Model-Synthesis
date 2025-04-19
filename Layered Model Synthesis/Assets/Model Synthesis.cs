@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[ExecuteAlways] //Always, since we might want to record the synthesis process in-game
 public class ModelSynthesis : MonoBehaviour
 {
     [SerializeField] private List<Tile> tiles;
