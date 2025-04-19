@@ -2,15 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteAlways] //Always, since we might want to record the synthesis process in-game
 public class Tile : MonoBehaviour
 {
-    [SerializeField] private HashSet<Tile> allowedAbove;
-    [SerializeField] private HashSet<Tile> allowedBelow; //Since we go from top left to bottom right, we technically don't need to check the below tile
-    [SerializeField] private HashSet<Tile> allowedNorth; //Since we go from top left to bottom right, we technically don't need to check the North tile
-    [SerializeField] private HashSet<Tile> allowedEast; 
-    [SerializeField] private HashSet<Tile> allowedSouth;
-    [SerializeField] private HashSet<Tile> allowedWest; //Since we go from top left to bottom right, we technically don't need to check the West tile
+    [SerializeField] private List<Tile> allowedAboveList;
+    [SerializeField] private List<Tile> allowedBelowList; //Since we go from top left to bottom right, we technically don't need to check the below tile
+    [SerializeField] private List<Tile> allowedNorthList; //Since we go from top left to bottom right, we technically don't need to check the North tile
+    [SerializeField] private List<Tile> allowedEastList;
+    [SerializeField] private List<Tile> allowedSouthList;
+    [SerializeField] private List<Tile> allowedWestList; //Since we go from top left to bottom right, we technically don't need to check the West tile
 
+    public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();
+    public HashSet<Tile> allowedBelow { get; private set; } = new HashSet<Tile>();
+    public HashSet<Tile> allowedNorth { get; private set; } = new HashSet<Tile>();
+    public HashSet<Tile> allowedEast  { get; private set; } = new HashSet<Tile>();
+    public HashSet<Tile> allowedSouth { get; private set; } = new HashSet<Tile>();
+    public HashSet<Tile> allowedWest  { get; private set; } = new HashSet<Tile>();
+
+    private void OnValidate()
+    {
+        allowedAbove = new HashSet<Tile>(allowedAboveList);
+        allowedBelow = new HashSet<Tile>(allowedBelowList);
+        allowedNorth = new HashSet<Tile>(allowedNorthList);
+        allowedEast  = new HashSet<Tile>(allowedEastList);
+        allowedSouth = new HashSet<Tile>(allowedSouthList);
+        allowedWest  = new HashSet<Tile>(allowedWestList);
+    }
+    
     public HashSet<Tile> GetAllowed(Direction dir)
     {
         return dir switch
