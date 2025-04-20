@@ -13,6 +13,7 @@ public class ModelSynthesis : MonoBehaviour
     [SerializeField] private int height;
 
     private HashSet<Tile>[,,] possibilities;
+    private Transform parentTransform;
     
     void Update()
     {
@@ -47,6 +48,7 @@ public class ModelSynthesis : MonoBehaviour
     /// </summary>
     private void Synthesise()
     {
+        parentTransform = new GameObject("Room").transform;
         for (int y = 0; y < height; y++)
         {
             for (int z = 0; z < length; z++)
@@ -146,6 +148,7 @@ public class ModelSynthesis : MonoBehaviour
 
     private void InitializePossibilities()
     {
+        possibilities = new HashSet<Tile>[width, height, length];
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -160,6 +163,7 @@ public class ModelSynthesis : MonoBehaviour
     
     private void PlaceTile(int x, int y, int z, Tile tile)
     {
-        Instantiate(tile, new Vector3(x, y, z), Quaternion.identity);
+        Tile newTile = Instantiate(tile, new Vector3(x, y, z), Quaternion.identity);
+        newTile.transform.SetParent(parentTransform);
     }
 }
