@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -11,6 +12,9 @@ public class ModelSynthesis : MonoBehaviour
     [SerializeField] private int width;
     [SerializeField] private int length;
     [SerializeField] private int height;
+    [SerializeField] private bool placeInOrder;
+    [SerializeField] float delayBetweenTilePlacement = 0.1f;
+    [SerializeField] GameObject poof;
 
     private HashSet<Tile>[,,] possibilities;
     private Transform parentTransform;
@@ -32,6 +36,13 @@ public class ModelSynthesis : MonoBehaviour
 
     private void BeginSynthesis()
     {
+        //If in editor, always place in order
+        if (!placeInOrder && Application.isEditor && !Application.isPlaying)
+        {
+            placeInOrder = true;
+            Debug.LogError("placeInOrder changed to TRUE; you are in editor mode.");
+        }
+        
         if(width <= 0 || height <= 0 || length <= 0)
         {
             Debug.LogError("Width, height and length must be greater than 0");
@@ -63,11 +74,15 @@ public class ModelSynthesis : MonoBehaviour
                     
                     Tile newTile = Observe(x, y, z);
                     Propagate(x, y, z);
+                    Debug.Log(possibilities[x, y, z].Count);
                     PlaceTile(x, y, z, newTile);
                 }
             }
         }
+        if(!placeInOrder) StartCoroutine(nameof(RandomlyPlaceTiles));
     }
+
+    
 
     /// <summary>
     /// Randomly selects a tile from the possibilities at the given coordinates
@@ -165,5 +180,16 @@ public class ModelSynthesis : MonoBehaviour
     {
         Tile newTile = Instantiate(tile, new Vector3(x, y, z), Quaternion.identity);
         newTile.transform.SetParent(parentTransform);
+        if(!placeInOrder) newTile.gameObject.SetActive(false);
+    }
+    
+    private IEnumerator RandomlyPlaceTiles()
+    {
+        foreach (Transform child in parentTransform)
+        {
+            child.gameObject.SetActive(true);
+            Instantiate(poof, child.position, Quaternion.identity);
+            yield return new WaitForSeconds(delayBetweenTilePlacement);
+        }
     }
 }
