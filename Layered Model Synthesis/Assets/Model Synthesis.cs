@@ -103,6 +103,8 @@ public class ModelSynthesis : MonoBehaviour
         
         for (int y = 0; y < height; y++)
         {
+            Transform layerTransform = new GameObject($"Layer{y}").transform;
+            layerTransform.SetParent(parentTransform);
             for (int z = 0; z < length; z++)
             {
                 for (int x = 0; x < width; x++)
@@ -115,7 +117,7 @@ public class ModelSynthesis : MonoBehaviour
                     
                     Possibility newTile = Observe(x, y, z);
                     Propagate(x, y, z);
-                    PlaceTile(x, y, z, newTile);
+                    PlaceTile(x, y, z, newTile,layerTransform);
                 }
             }
         }
@@ -318,10 +320,10 @@ public class ModelSynthesis : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <param name="tile"></param>
-    private void PlaceTile(int x, int y, int z, Possibility possibility)
+    private void PlaceTile(int x, int y, int z, Possibility possibility, Transform parent)
     {
         Tile newTile = Instantiate(possibility.tile, new Vector3(x, y, z), possibility.GetRotation());
-        newTile.transform.SetParent(parentTransform);
+        newTile.transform.SetParent(parent);
         if(animate) newTile.gameObject.SetActive(false);
     }
     
