@@ -16,6 +16,7 @@ public class ModelSynthesis : MonoBehaviour
     [SerializeField] private bool animate;
     [SerializeField] float delayBetweenTilePlacement = 0.1f;
     [SerializeField] GameObject poof;
+    [SerializeField] private Tile border;
 
     private HashSet<Tile>[,,] possibilities;
     private Transform parentTransform;
@@ -73,16 +74,14 @@ public class ModelSynthesis : MonoBehaviour
                         return;
                     }
                     
-                    Tile newTile = Observe(x, y, z);
                     Propagate(x, y, z);
+                    Tile newTile = Observe(x, y, z);
                     PlaceTile(x, y, z, newTile);
                 }
             }
         }
         if(animate) StartCoroutine(nameof(RandomlyPlaceTiles));
     }
-
-    
 
     /// <summary>
     /// Randomly selects a tile from the possibilities at the given coordinates
@@ -106,7 +105,7 @@ public class ModelSynthesis : MonoBehaviour
         if (!InGrid(x, y, z)) return;
         
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>();
-        foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
+        /*foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
         {
             (int dx, int dy, int dz) = d.ToOffset();
             int nx = x + dx;
@@ -115,14 +114,15 @@ public class ModelSynthesis : MonoBehaviour
 
             if (!InGrid(nx, ny, nz)) continue;
             q.Push((nx, ny, nz));
-        }
+        }*/
+        q.Push((x, y, z));
         
         while (q.Count > 0)
         {
             (x, y, z) = q.Pop();
             if (possibilities[x, y, z].Count == 0)
             {
-                Debug.LogError("No possibilities left when trying to propagate");
+                Debug.LogError($"No possibilities left when trying to propagate at {x}/{y}/{z}");
                 return;
             }
 
@@ -135,24 +135,40 @@ public class ModelSynthesis : MonoBehaviour
                 int ny = y + dy;
                 int nz = z + dz;
 
-                if (!InGrid(nx, ny, nz)) continue;
-
-                HashSet<Tile> allowedByThis = new HashSet<Tile>();
-                foreach (var tile in possibilities[x, y, z])
+                if (!InGrid(nx, ny, nz)) //Handle border
                 {
-                    if (possibilities[nx, ny, nz].Intersect(tile.GetAllowed(d)).Any())
+                    /*HashSet<Tile> allowedByThis = new HashSet<Tile>();
+                    foreach (var tile in possibilities[x, y, z])
                     {
-                        allowedByThis.Add(tile);
+                        if (tile.GetAllowed(d).Contains(border))
+                        {
+                            allowedByThis.Add(tile);
+                        }
                     }
-                }
-                possibilities[x, y, z].IntersectWith(allowedByThis);
+                    possibilities[x, y, z].IntersectWith(allowedByThis);*/
                 
-                HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
-                foreach (var tile in possibilities[nx, ny, nz])
-                {
-                    allowedByNeighbour.UnionWith(tile.GetAllowed(d.GetOpposite()));
+                    HashSet<Tile> allowedByNeighbour = border.GetAllowed(d.GetOpposite());
+                    possibilities[x, y, z].IntersectWith(allowedByNeighbour);
                 }
-                possibilities[x, y, z].IntersectWith(allowedByNeighbour);
+                else // Normal tile
+                {
+                    HashSet<Tile> allowedByThis = new HashSet<Tile>();
+                    foreach (var tile in possibilities[x, y, z])
+                    {
+                        if (possibilities[nx, ny, nz].Intersect(tile.GetAllowed(d)).Any())
+                        {
+                            allowedByThis.Add(tile);
+                        }
+                    }
+                    possibilities[x, y, z].IntersectWith(allowedByThis);
+                    
+                    HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
+                    foreach (var tile in possibilities[nx, ny, nz])
+                    {
+                        allowedByNeighbour.UnionWith(tile.GetAllowed(d.GetOpposite()));
+                    }
+                    possibilities[x, y, z].IntersectWith(allowedByNeighbour);
+                }
             }
             
             // Check if any possibilities have been removed - if so propagate on neighbours
