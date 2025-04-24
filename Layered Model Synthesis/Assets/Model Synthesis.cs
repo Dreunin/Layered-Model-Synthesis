@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [ExecuteAlways] //Always, since we might want to record the synthesis process in-game
 public class ModelSynthesis : MonoBehaviour
@@ -12,7 +13,7 @@ public class ModelSynthesis : MonoBehaviour
     [SerializeField] private int width;
     [SerializeField] private int length;
     [SerializeField] private int height;
-    [SerializeField] private bool placeInOrder;
+    [SerializeField] private bool animate;
     [SerializeField] float delayBetweenTilePlacement = 0.1f;
     [SerializeField] GameObject poof;
 
@@ -36,11 +37,11 @@ public class ModelSynthesis : MonoBehaviour
 
     private void BeginSynthesis()
     {
-        //If in editor, always place in order
-        if (!placeInOrder && Application.isEditor && !Application.isPlaying)
+        //If in editor, never animate
+        if (animate && Application.isEditor && !Application.isPlaying)
         {
-            placeInOrder = true;
-            Debug.LogError("placeInOrder changed to TRUE; you are in editor mode.");
+            animate = false;
+            Debug.LogError("animate changed to FALSE; you are in editor mode.");
         }
         
         if(width <= 0 || height <= 0 || length <= 0)
@@ -74,12 +75,11 @@ public class ModelSynthesis : MonoBehaviour
                     
                     Tile newTile = Observe(x, y, z);
                     Propagate(x, y, z);
-                    Debug.Log(possibilities[x, y, z].Count);
                     PlaceTile(x, y, z, newTile);
                 }
             }
         }
-        if(!placeInOrder) StartCoroutine(nameof(RandomlyPlaceTiles));
+        if(animate) StartCoroutine(nameof(RandomlyPlaceTiles));
     }
 
     
@@ -106,7 +106,17 @@ public class ModelSynthesis : MonoBehaviour
         if (!InGrid(x, y, z)) return;
         
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>();
-        q.Push((x, y, z));
+        foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
+        {
+            (int dx, int dy, int dz) = d.ToOffset();
+            int nx = x + dx;
+            int ny = y + dy;
+            int nz = z + dz;
+
+            if (!InGrid(nx, ny, nz)) continue;
+            q.Push((nx, ny, nz));
+        }
+        
         while (q.Count > 0)
         {
             (x, y, z) = q.Pop();
@@ -130,16 +140,19 @@ public class ModelSynthesis : MonoBehaviour
                 HashSet<Tile> allowedByThis = new HashSet<Tile>();
                 foreach (var tile in possibilities[x, y, z])
                 {
-                    allowedByThis.AddRange(tile.GetAllowed(d));
+                    if (possibilities[nx, ny, nz].Intersect(tile.GetAllowed(d)).Any())
+                    {
+                        allowedByThis.Add(tile);
+                    }
                 }
-                possibilities[x, y, z].UnionWith(allowedByThis);
+                possibilities[x, y, z].IntersectWith(allowedByThis);
                 
                 HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
                 foreach (var tile in possibilities[nx, ny, nz])
                 {
-                    allowedByNeighbour.AddRange(tile.GetAllowed(d.GetOpposite()));
+                    allowedByNeighbour.UnionWith(tile.GetAllowed(d.GetOpposite()));
                 }
-                possibilities[x, y, z].UnionWith(allowedByNeighbour);
+                possibilities[x, y, z].IntersectWith(allowedByNeighbour);
             }
             
             // Check if any possibilities have been removed - if so propagate on neighbours
@@ -180,7 +193,7 @@ public class ModelSynthesis : MonoBehaviour
     {
         Tile newTile = Instantiate(tile, new Vector3(x, y, z), Quaternion.identity);
         newTile.transform.SetParent(parentTransform);
-        if(!placeInOrder) newTile.gameObject.SetActive(false);
+        if(animate) newTile.gameObject.SetActive(false);
     }
     
     private IEnumerator RandomlyPlaceTiles()

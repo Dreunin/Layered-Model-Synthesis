@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1860344789824843572}
   - component: {fileID: 6394344399613166981}
   - component: {fileID: 6745518562127075948}
+  - component: {fileID: 262106390879836795}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -86,3 +87,48 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &262106390879836795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5204113085100113992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allowedAboveList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795}
+  allowedBelowList:
+  - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
+  - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
+  - {fileID: 262106390879836795}
+  allowedNorthList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  allowedEastList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  allowedSouthList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  allowedWestList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}

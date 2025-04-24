@@ -439,6 +439,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4106733881597484228}
+  - component: {fileID: 5286576627878375482}
   m_Layer: 0
   m_Name: Chair1x2x1
   m_TagString: Untagged
@@ -467,6 +468,49 @@ Transform:
   - {fileID: 41050697553147860}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5286576627878375482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5674000211383219324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allowedAboveList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  allowedBelowList:
+  - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
+  - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
+  allowedNorthList:
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 5286576627878375482}
+  allowedEastList:
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 5286576627878375482}
+  allowedSouthList:
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 5286576627878375482}
+  allowedWestList:
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 5286576627878375482}
 --- !u!1 &6569066097654756412
 GameObject:
   m_ObjectHideFlags: 0

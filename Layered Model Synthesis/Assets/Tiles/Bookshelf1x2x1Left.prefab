@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 142635224715304017}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.72519416, z: -0, w: 0.6885445}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -1, y: 0, z: -0.051}
   m_LocalScale: {x: 12.500004, y: 100, z: 1.2500002}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -439,6 +439,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8597242453820252244}
+  - component: {fileID: -7275378623634293086}
   m_Layer: 0
   m_Name: Bookshelf1x2x1Left
   m_TagString: Untagged
@@ -468,6 +469,41 @@ Transform:
   - {fileID: 6164580143497737893}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-7275378623634293086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4872236485699244873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allowedAboveList:
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  allowedBelowList:
+  - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
+  - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
+  allowedNorthList:
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  allowedEastList:
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
+  allowedSouthList:
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  allowedWestList:
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
 --- !u!1 &4957765669323401486
 GameObject:
   m_ObjectHideFlags: 0
