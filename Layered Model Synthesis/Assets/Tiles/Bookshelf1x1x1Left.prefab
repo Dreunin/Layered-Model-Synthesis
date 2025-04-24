@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8358997190945245888
+--- !u!1 &4872236485699244873
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,38 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2218212342337355440}
-  - component: {fileID: 6638298772880334903}
+  - component: {fileID: 8597242453820252244}
+  - component: {fileID: -7275378623634293086}
   m_Layer: 0
-  m_Name: Bookshelf1x2x1Right
+  m_Name: Bookshelf1x1x1Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2218212342337355440
+--- !u!4 &8597242453820252244
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8358997190945245888}
+  m_GameObject: {fileID: 4872236485699244873}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8500814660651169627}
+  - {fileID: 3279368356388209787}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6638298772880334903
+--- !u!114 &-7275378623634293086
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8358997190945245888}
+  m_GameObject: {fileID: 4872236485699244873}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
@@ -47,37 +47,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allowedAboveList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
-  - {fileID: 6638298772880334903}
+  - {fileID: -7275378623634293086}
   allowedBelowList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
   - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
-  - {fileID: 6638298772880334903}
+  - {fileID: -7275378623634293086}
   allowedNorthList:
-  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
   - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   allowedEastList:
-  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
-  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
-  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
-  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
   allowedSouthList:
-  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
   - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   allowedWestList:
-  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
+  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
+  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   allowRotation: 1
---- !u!1001 &8246738085454729392
+--- !u!1001 &3028689820345983888
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 2218212342337355440}
+    m_TransformParent: {fileID: 8597242453820252244}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 606dfa79f8f02614f94f72001a1e335b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -123,13 +123,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bookshelf1x1x1
       objectReference: {fileID: 0}
+    - target: {fileID: 7632008546337412892, guid: 606dfa79f8f02614f94f72001a1e335b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 606dfa79f8f02614f94f72001a1e335b, type: 3}
---- !u!4 &8500814660651169627 stripped
+--- !u!4 &3279368356388209787 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 606dfa79f8f02614f94f72001a1e335b, type: 3}
-  m_PrefabInstance: {fileID: 8246738085454729392}
+  m_PrefabInstance: {fileID: 3028689820345983888}
   m_PrefabAsset: {fileID: 0}

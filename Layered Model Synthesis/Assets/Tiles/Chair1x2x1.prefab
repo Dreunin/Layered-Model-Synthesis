@@ -515,6 +515,7 @@ MonoBehaviour:
   - {fileID: 5286576627878375482}
   - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  allowRotation: 1
 --- !u!1 &6569066097654756412
 GameObject:
   m_ObjectHideFlags: 0

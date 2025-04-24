@@ -468,7 +468,7 @@ MonoBehaviour:
   synthesise: 0
   width: 10
   length: 10
-  height: 1
+  height: 5
   animate: 0
   delayBetweenTilePlacement: 0.5
   poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
