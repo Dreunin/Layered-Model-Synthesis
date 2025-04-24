@@ -10,7 +10,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private List<Tile> allowedEastList;
     [SerializeField] private List<Tile> allowedSouthList;
     [SerializeField] private List<Tile> allowedWestList; //Since we go from top left to bottom right, we technically don't need to check the West tile
-
+    public bool allowRotation;
     public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedBelow { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedNorth { get; private set; } = new HashSet<Tile>();
@@ -28,16 +28,23 @@ public class Tile : MonoBehaviour
         allowedWest  = new HashSet<Tile>(allowedWestList);
     }
     
-    public HashSet<Tile> GetAllowed(Direction dir)
+    public HashSet<Tile> GetAllowed(Direction dir, Rotation rot = Rotation.zero)
     {
-        return dir switch
+        if (dir == Direction.ABOVE)
         {
-            Direction.ABOVE => allowedAbove,
-            Direction.BELOW => allowedBelow,
-            Direction.NORTH => allowedNorth,
-            Direction.EAST => allowedEast,
-            Direction.SOUTH => allowedSouth,
-            Direction.WEST => allowedWest,
+            return allowedAbove;
+        } 
+        if (dir == Direction.BELOW)
+        {
+            return allowedBelow;
+        }
+        
+        return (((int) dir + (int) rot) % 4) switch //Use enum casts to rotate 90 degrees per angle
+        {
+            0 => allowedNorth,
+            1 => allowedEast,
+            2 => allowedSouth,
+            3 => allowedWest,
             _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
         };
     }
