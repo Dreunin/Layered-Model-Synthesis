@@ -62,6 +62,9 @@ public class ModelSynthesis : MonoBehaviour
     private void Synthesise()
     {
         parentTransform = new GameObject("Room").transform;
+
+        MassPropagate();
+        
         for (int y = 0; y < height; y++)
         {
             for (int z = 0; z < length; z++)
@@ -74,13 +77,30 @@ public class ModelSynthesis : MonoBehaviour
                         return;
                     }
                     
-                    Propagate(x, y, z);
                     Tile newTile = Observe(x, y, z);
+                    Propagate(x, y, z);
                     PlaceTile(x, y, z, newTile);
                 }
             }
         }
-        if(animate) StartCoroutine(nameof(RandomlyPlaceTiles));
+        if(animate) StartCoroutine(nameof(AnimatePlaceTiles));
+    }
+
+    /// <summary>
+    /// Initial propagation over the entire grid
+    /// </summary>
+    private void MassPropagate()
+    {
+        for(int x = 0; x < width; x++)
+        {
+            for(int y = 0; y < height; y++)
+            {
+                for(int z = 0; z < length; z++)
+                {
+                    Propagate(x, y, z, true);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -100,22 +120,28 @@ public class ModelSynthesis : MonoBehaviour
     }
 
 
-    private void Propagate(int x, int y, int z)
+    private void Propagate(int x, int y, int z, bool propagateFromSelf = false)
     {
         if (!InGrid(x, y, z)) return;
         
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>();
-        /*foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
+        if (!propagateFromSelf)
         {
-            (int dx, int dy, int dz) = d.ToOffset();
-            int nx = x + dx;
-            int ny = y + dy;
-            int nz = z + dz;
+            foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
+            {
+                (int dx, int dy, int dz) = d.ToOffset();
+                int nx = x + dx;
+                int ny = y + dy;
+                int nz = z + dz;
 
-            if (!InGrid(nx, ny, nz)) continue;
-            q.Push((nx, ny, nz));
-        }*/
-        q.Push((x, y, z));
+                if (!InGrid(nx, ny, nz)) continue;
+                q.Push((nx, ny, nz));
+            }
+        }
+        else
+        {
+            q.Push((x, y, z)); // Start with the current tile
+        }
         
         while (q.Count > 0)
         {
@@ -205,6 +231,13 @@ public class ModelSynthesis : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Places a tile (prefab) at the given coordinates.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <param name="tile"></param>
     private void PlaceTile(int x, int y, int z, Tile tile)
     {
         Tile newTile = Instantiate(tile, new Vector3(x, y, z), Quaternion.identity);
@@ -212,7 +245,7 @@ public class ModelSynthesis : MonoBehaviour
         if(animate) newTile.gameObject.SetActive(false);
     }
     
-    private IEnumerator RandomlyPlaceTiles()
+    private IEnumerator AnimatePlaceTiles()
     {
         foreach (Transform child in parentTransform)
         {
