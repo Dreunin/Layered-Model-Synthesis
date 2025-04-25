@@ -178,7 +178,7 @@ public class ModelSynthesis : MonoBehaviour
         }
         else
         {
-            q.Push((x, y, z)); // Start with the current tile
+            q.Push((x, y, z)); // Start with the initial tile
         }
         
         while (q.Count > 0)
@@ -190,7 +190,7 @@ public class ModelSynthesis : MonoBehaviour
                 return;
             }
 
-            int countBefore = possibilities[x, y, z].Count;
+            int countBefore = possibilities[x, y, z].Count; //Used to check if we need to propagate again
 
             foreach (Direction d in DirectionExtensions.GetDirections())
             {
@@ -217,7 +217,7 @@ public class ModelSynthesis : MonoBehaviour
                 else // Normal tile
                 {
                     HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
-                    foreach (var possibility in possibilities[x, y, z])
+                    foreach (var possibility in possibilities[x, y, z]) //Check if the tile at (x,y,z) allows the tile at (nx,ny,nz)
                     {
                         if (possibilities[nx, ny, nz].Intersect(PossibilitiesFromTiles(possibility.tile.GetAllowed(d,possibility.rotation))).Any())
                         {
@@ -227,11 +227,26 @@ public class ModelSynthesis : MonoBehaviour
                     possibilities[x, y, z].IntersectWith(allowedByThis);
                     
                     HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
-                    foreach (var possibility in possibilities[nx, ny, nz])
+                    foreach (var possibility in possibilities[nx, ny, nz]) //Check if the tile at (nx,ny,nz) allows the tile at (x,y,z)
                     {
                         allowedByNeighbour.UnionWith(possibility.tile.GetAllowed(d.GetOpposite(),possibility.rotation));
                     }
-                    possibilities[x, y, z].IntersectWith(PossibilitiesFromTiles(allowedByNeighbour));
+                    HashSet<Possibility> allowedByNeighbourPossibilities = PossibilitiesFromTiles(allowedByNeighbour);
+                    
+                    if(d == Direction.BELOW && possibilities[nx,ny,nz].ElementAt(0).tile.sameRotationWhenStacked) //Enforce above tiles follow below rotation. Tiles below have always already been placed.
+                    {
+                        //We remove any possibility that doesn't have the same rotation as the tile below
+                        for (int i = allowedByNeighbourPossibilities.Count - 1; i >= 0; i--)
+                        {
+                            Possibility p = allowedByNeighbourPossibilities.ElementAt(i);
+                            if (possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
+                            {
+                                allowedByNeighbourPossibilities.Remove(p);
+                            }
+                        }
+                    }
+                    
+                    possibilities[x, y, z].IntersectWith(allowedByNeighbourPossibilities);
                 }
             }
             

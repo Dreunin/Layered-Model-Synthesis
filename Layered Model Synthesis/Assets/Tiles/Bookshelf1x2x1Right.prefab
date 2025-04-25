@@ -71,6 +71,7 @@ MonoBehaviour:
   allowedWestList:
   - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
   allowRotation: 1
+  sameRotationWhenStacked: 1
 --- !u!1001 &8246738085454729392
 PrefabInstance:
   m_ObjectHideFlags: 0
