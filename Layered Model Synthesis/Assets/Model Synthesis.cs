@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 [ExecuteAlways] //Always, since we might want to record the synthesis process in-game
 public class ModelSynthesis : MonoBehaviour
@@ -18,9 +20,43 @@ public class ModelSynthesis : MonoBehaviour
     [SerializeField] GameObject poof;
     [SerializeField] private Tile border;
 
-    private HashSet<Tile>[,,] possibilities;
+    private HashSet<Possibility>[,,] possibilities;
     private Transform parentTransform;
-    
+
+    public class Possibility
+    {
+        public Tile tile;
+        public Rotation rotation;
+
+        public Possibility(Tile tile, Rotation rotation)
+        {
+            this.tile = tile;
+            this.rotation = rotation;
+        }
+
+        public Quaternion GetRotation()
+        {
+            return rotation switch
+            {
+                Rotation.zero => Quaternion.Euler(0, 0, 0),
+                Rotation.ninety => Quaternion.Euler(0, -90, 0),
+                Rotation.oneEighty => Quaternion.Euler(0, -180, 0),
+                Rotation.twoSeventy => Quaternion.Euler(0, -270, 0),
+            };
+        }
+        
+        public override bool Equals(object obj)
+        {
+            if (obj is not Possibility other) return false;
+            return tile == other.tile && rotation == other.rotation;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(tile, (int)rotation);
+        }
+    }
+
     void Update()
     {
         if (synthesise)
@@ -67,6 +103,8 @@ public class ModelSynthesis : MonoBehaviour
         
         for (int y = 0; y < height; y++)
         {
+            Transform layerTransform = new GameObject($"Layer{y}").transform;
+            layerTransform.SetParent(parentTransform);
             for (int z = 0; z < length; z++)
             {
                 for (int x = 0; x < width; x++)
@@ -77,9 +115,9 @@ public class ModelSynthesis : MonoBehaviour
                         return;
                     }
                     
-                    Tile newTile = Observe(x, y, z);
+                    Possibility newTile = Observe(x, y, z);
                     Propagate(x, y, z);
-                    PlaceTile(x, y, z, newTile);
+                    PlaceTile(x, y, z, newTile,layerTransform);
                 }
             }
         }
@@ -110,10 +148,10 @@ public class ModelSynthesis : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <returns></returns>
-    private Tile Observe(int x, int y, int z)
+    private Possibility Observe(int x, int y, int z)
     {
         if (!InGrid(x, y, z)) return null;
-        Tile observed = possibilities[x, y, z].ElementAt(Random.Range(0, possibilities[x, y, z].Count));
+        Possibility observed = possibilities[x, y, z].ElementAt(Random.Range(0, possibilities[x, y, z].Count));
         possibilities[x, y, z].Clear();
         possibilities[x, y, z].Add(observed);
         return observed;
@@ -140,7 +178,7 @@ public class ModelSynthesis : MonoBehaviour
         }
         else
         {
-            q.Push((x, y, z)); // Start with the current tile
+            q.Push((x, y, z)); // Start with the initial tile
         }
         
         while (q.Count > 0)
@@ -152,7 +190,7 @@ public class ModelSynthesis : MonoBehaviour
                 return;
             }
 
-            int countBefore = possibilities[x, y, z].Count;
+            int countBefore = possibilities[x, y, z].Count; //Used to check if we need to propagate again
 
             foreach (Direction d in DirectionExtensions.GetDirections())
             {
@@ -173,27 +211,42 @@ public class ModelSynthesis : MonoBehaviour
                     }
                     possibilities[x, y, z].IntersectWith(allowedByThis);*/
                 
-                    HashSet<Tile> allowedByNeighbour = border.GetAllowed(d.GetOpposite());
+                    HashSet<Possibility> allowedByNeighbour = PossibilitiesFromTiles(border.GetAllowed(d.GetOpposite()));
                     possibilities[x, y, z].IntersectWith(allowedByNeighbour);
                 }
                 else // Normal tile
                 {
-                    HashSet<Tile> allowedByThis = new HashSet<Tile>();
-                    foreach (var tile in possibilities[x, y, z])
+                    HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
+                    foreach (var possibility in possibilities[x, y, z]) //Check if the tile at (x,y,z) allows the tile at (nx,ny,nz)
                     {
-                        if (possibilities[nx, ny, nz].Intersect(tile.GetAllowed(d)).Any())
+                        if (possibilities[nx, ny, nz].Intersect(PossibilitiesFromTiles(possibility.tile.GetAllowed(d,possibility.rotation))).Any())
                         {
-                            allowedByThis.Add(tile);
+                            allowedByThis.Add(possibility);
                         }
                     }
                     possibilities[x, y, z].IntersectWith(allowedByThis);
                     
                     HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
-                    foreach (var tile in possibilities[nx, ny, nz])
+                    foreach (var possibility in possibilities[nx, ny, nz]) //Check if the tile at (nx,ny,nz) allows the tile at (x,y,z)
                     {
-                        allowedByNeighbour.UnionWith(tile.GetAllowed(d.GetOpposite()));
+                        allowedByNeighbour.UnionWith(possibility.tile.GetAllowed(d.GetOpposite(),possibility.rotation));
                     }
-                    possibilities[x, y, z].IntersectWith(allowedByNeighbour);
+                    HashSet<Possibility> allowedByNeighbourPossibilities = PossibilitiesFromTiles(allowedByNeighbour);
+                    
+                    if(d == Direction.BELOW && possibilities[nx,ny,nz].ElementAt(0).tile.sameRotationWhenStacked) //Enforce above tiles follow below rotation. Tiles below have always already been placed.
+                    {
+                        //We remove any possibility that doesn't have the same rotation as the tile below
+                        for (int i = allowedByNeighbourPossibilities.Count - 1; i >= 0; i--)
+                        {
+                            Possibility p = allowedByNeighbourPossibilities.ElementAt(i);
+                            if (possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
+                            {
+                                allowedByNeighbourPossibilities.Remove(p);
+                            }
+                        }
+                    }
+                    
+                    possibilities[x, y, z].IntersectWith(allowedByNeighbourPossibilities);
                 }
             }
             
@@ -215,22 +268,66 @@ public class ModelSynthesis : MonoBehaviour
         }
     }
 
+    private HashSet<Possibility> PossibilitiesFromTiles(HashSet<Tile> tiles)
+    {
+        //Returns all posibliites with all rotations for relevant tiles
+        HashSet<Possibility> _possibilities = new HashSet<Possibility>();
+        foreach (Tile tile in tiles)
+        {
+            if (tile.allowRotation)
+            {
+                _possibilities.Add(new Possibility(tile, Rotation.zero));
+                _possibilities.Add(new Possibility(tile, Rotation.ninety));
+                _possibilities.Add(new Possibility(tile, Rotation.oneEighty));
+                _possibilities.Add(new Possibility(tile, Rotation.twoSeventy));
+            }
+            else
+            {
+                _possibilities.Add(new Possibility(tile, Rotation.zero));
+            }
+        }
+        return _possibilities;
+    }
+
 
     private void InitializePossibilities()
     {
-        possibilities = new HashSet<Tile>[width, height, length];
+        List<Possibility> allPossibleTiles = InitialPossibilities();
+        possibilities = new HashSet<Possibility>[width, height, length];
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 for (int z = 0; z < length; z++)
                 {
-                    possibilities[x, y, z] = new HashSet<Tile>(tiles);
+                    possibilities[x, y, z] = new HashSet<Possibility>(allPossibleTiles);
                 }
             }
         }
     }
-    
+
+    public List<Possibility> InitialPossibilities()
+    {
+        //For each tile, create a possibility for each rotation if allowRotation is true
+        List<Possibility> allPossibleTiles = new List<Possibility>();
+        foreach (Tile tile in tiles)
+        {
+            if (tile.allowRotation)
+            {
+                allPossibleTiles.Add(new Possibility(tile, Rotation.zero));
+                allPossibleTiles.Add(new Possibility(tile, Rotation.ninety));
+                allPossibleTiles.Add(new Possibility(tile, Rotation.oneEighty));
+                allPossibleTiles.Add(new Possibility(tile, Rotation.twoSeventy));
+            }
+            else
+            {
+                allPossibleTiles.Add(new Possibility(tile, Rotation.zero));
+            }
+        }
+
+        return allPossibleTiles;
+    }
+
     /// <summary>
     /// Places a tile (prefab) at the given coordinates.
     /// </summary>
@@ -238,10 +335,10 @@ public class ModelSynthesis : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <param name="tile"></param>
-    private void PlaceTile(int x, int y, int z, Tile tile)
+    private void PlaceTile(int x, int y, int z, Possibility possibility, Transform parent)
     {
-        Tile newTile = Instantiate(tile, new Vector3(x, y, z), Quaternion.identity);
-        newTile.transform.SetParent(parentTransform);
+        Tile newTile = Instantiate(possibility.tile, new Vector3(x, y, z), possibility.GetRotation());
+        newTile.transform.SetParent(parent);
         if(animate) newTile.gameObject.SetActive(false);
     }
     
