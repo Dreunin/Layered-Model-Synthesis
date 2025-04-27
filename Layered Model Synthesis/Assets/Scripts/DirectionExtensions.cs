@@ -31,4 +31,18 @@ public static class DirectionExtensions
             _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
         };
     }
+
+    public static string GetName(this Direction dir)
+    {
+        return dir switch
+        {
+            Direction.ABOVE => "Above",
+            Direction.BELOW => "Below",
+            Direction.NORTH => "North",
+            Direction.EAST => "East",
+            Direction.SOUTH => "South",
+            Direction.WEST => "West",
+            _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
+        };
+    }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
+    [SerializeField] private Tileset tileset;
     [SerializeField] private List<Tile> allowedAboveList;
     [SerializeField] private List<Tile> allowedBelowList; //Since we go from top left to bottom right, we technically don't need to check the below tile
     [SerializeField] private List<Tile> allowedNorthList; //Since we go from top left to bottom right, we technically don't need to check the North tile
