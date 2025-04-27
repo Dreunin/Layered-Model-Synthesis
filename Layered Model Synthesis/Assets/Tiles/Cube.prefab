@@ -103,6 +103,7 @@ MonoBehaviour:
   allowedAboveList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
+  - {fileID: 262106390879836795}
   allowedBelowList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
@@ -136,3 +137,5 @@ MonoBehaviour:
   - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
   - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
   - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
+  allowRotation: 0
+  sameRotationWhenStacked: 0
