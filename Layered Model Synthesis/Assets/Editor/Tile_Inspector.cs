@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [CustomEditor(typeof(Tile))]
@@ -19,8 +20,6 @@ public class Tile_Inspector : Editor
     SerializedProperty allowedEastProp;
     SerializedProperty allowedSouthProp;
     SerializedProperty allowedWestProp;
-    
-    private Dictionary<Direction, SerializedProperty> directionToPropertyMap;
     
     private void OnEnable()
     {
@@ -45,6 +44,8 @@ public class Tile_Inspector : Editor
         root.Add(CreateRotationField());
         root.Add(CreateStackedField());
 
+        root.Add(CreateHeader("Allowed Neighbours"));
+        
         if (tilesetProp.objectReferenceValue == null)
         {
             var label = new Label("Add a tileset to pick allowed neighbours.");
@@ -80,6 +81,16 @@ public class Tile_Inspector : Editor
         });
         
         return propertyField;
+    }
+
+    private VisualElement CreateHeader(string text)
+    {
+        var container = new VisualElement();
+        container.AddToClassList("unity-decorator-drawers-container");
+        var neighboursHeader = new Label(text);
+        neighboursHeader.AddToClassList("unity-header-drawer__label");
+        container.Add(neighboursHeader);
+        return container;
     }
 
     private VisualElement CreateRotationField()
@@ -146,11 +157,43 @@ public class Tile_Inspector : Editor
                     SerializedProperty element = listProperty.GetArrayElementAtIndex(listProperty.arraySize - 1);
                     element.objectReferenceValue = neighborTile;
                 }
+                
+                // Add to the other tiles opposite direction
+                if (neighborTile == target)
+                {
+                    var oppositeListProperty = GetPropertyForDirection(direction.GetOpposite()); 
+                    if (!IsTileInList(oppositeListProperty, neighborTile))
+                    {
+                        oppositeListProperty.InsertArrayElementAtIndex(oppositeListProperty.arraySize);
+                        SerializedProperty element = oppositeListProperty.GetArrayElementAtIndex(oppositeListProperty.arraySize - 1);
+                        element.objectReferenceValue = neighborTile;
+                    }
+                }
+                else
+                {
+                    var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
+                    if (!otherList.Contains((Tile) target))
+                    {
+                        otherList.Add((Tile) target);
+                    }
+                }
             }
             else
             {
                 // Remove tile from the list
                 RemoveTileFromList(listProperty, neighborTile);
+                
+                // Remove from the other tiles opposite direction
+                if (neighborTile == target)
+                {
+                    var oppositeListProperty = GetPropertyForDirection(direction.GetOpposite());
+                    RemoveTileFromList(oppositeListProperty, neighborTile);                    
+                }
+                else
+                {
+                    var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
+                    otherList.Remove((Tile) target);
+                }
             }
             
             serializedObject.ApplyModifiedProperties();
@@ -175,6 +218,20 @@ public class Tile_Inspector : Editor
             Direction.EAST => allowedEastProp,
             Direction.SOUTH => allowedSouthProp,
             Direction.WEST => allowedWestProp,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+        };
+    }
+
+    private List<Tile> GetAllowedForDirection(Tile tile, Direction direction)
+    {
+        return direction switch
+        {
+            Direction.ABOVE => tile.allowedAboveList,
+            Direction.BELOW => tile.allowedBelowList,
+            Direction.NORTH => tile.allowedNorthList,
+            Direction.EAST => tile.allowedEastList,
+            Direction.SOUTH => tile.allowedSouthList,
+            Direction.WEST => tile.allowedWestList,
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
