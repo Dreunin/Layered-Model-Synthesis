@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    [SerializeField] private Tileset tileset;
-    [SerializeField] private List<Tile> allowedAboveList;
-    [SerializeField] private List<Tile> allowedBelowList; //Since we go from top left to bottom right, we technically don't need to check the below tile
-    [SerializeField] private List<Tile> allowedNorthList; //Since we go from top left to bottom right, we technically don't need to check the North tile
-    [SerializeField] private List<Tile> allowedEastList;
-    [SerializeField] private List<Tile> allowedSouthList;
-    [SerializeField] private List<Tile> allowedWestList; //Since we go from top left to bottom right, we technically don't need to check the West tile
+    [SerializeField] public Tileset tileset;
+    [SerializeField] public List<Tile> allowedAboveList;
+    [SerializeField] public List<Tile> allowedBelowList; //Since we go from top left to bottom right, we technically don't need to check the below tile
+    [SerializeField] public List<Tile> allowedNorthList; //Since we go from top left to bottom right, we technically don't need to check the North tile
+    [SerializeField] public List<Tile> allowedEastList;
+    [SerializeField] public List<Tile> allowedSouthList;
+    [SerializeField] public List<Tile> allowedWestList; //Since we go from top left to bottom right, we technically don't need to check the West tile
     public bool allowRotation;
     public bool sameRotationWhenStacked; //If true, the tile will always be rotated to the same rotation as the tile below it
     
