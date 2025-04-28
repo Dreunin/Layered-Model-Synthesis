@@ -34,7 +34,6 @@ public class Tile_Inspector : Editor
         allowedEastProp = serializedObject.FindProperty("allowedEastList");
         allowedSouthProp = serializedObject.FindProperty("allowedSouthList");
         allowedWestProp = serializedObject.FindProperty("allowedWestList");
-        Debug.Log(serializedObject.FindProperty("allowedAbove"));
     }
     
     public override VisualElement CreateInspectorGUI()
@@ -99,8 +98,11 @@ public class Tile_Inspector : Editor
 
     private VisualElement CreateDirectionFoldout(Direction direction)
     {
-        var foldout = new Foldout();
-        foldout.text = direction.GetName();
+        var foldout = new Foldout
+        {
+            text = direction.GetName(),
+            viewDataKey = $"{target.name}_{direction}"
+        };
 
         Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
         
