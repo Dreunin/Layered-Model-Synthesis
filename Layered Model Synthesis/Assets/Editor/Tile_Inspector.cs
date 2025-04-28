@@ -34,6 +34,7 @@ public class Tile_Inspector : Editor
         allowedEastProp = serializedObject.FindProperty("allowedEastList");
         allowedSouthProp = serializedObject.FindProperty("allowedSouthList");
         allowedWestProp = serializedObject.FindProperty("allowedWestList");
+        Debug.Log(serializedObject.FindProperty("allowedAbove"));
     }
     
     public override VisualElement CreateInspectorGUI()
