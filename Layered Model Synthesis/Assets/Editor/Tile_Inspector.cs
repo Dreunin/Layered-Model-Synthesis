@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -115,8 +116,19 @@ public class Tile_Inspector : Editor
             viewDataKey = $"{target.name}_{direction}"
         };
         
-        foldout.Add(CreateSelectAllButton(direction));
-        foldout.Add(CreateDeselectAllButton(direction));
+        // Create buttons
+        var selectContainer = new VisualElement();
+        selectContainer.style.flexDirection = FlexDirection.Row;
+        selectContainer.Add(CreateSelectAllButton(direction));
+        selectContainer.Add(CreateDeselectAllButton(direction));
+        foldout.Add(selectContainer);
+        
+        foldout.Add(CreateCopyToAllButton(direction));
+
+        if (DirectionExtensions.GetCardinalDirections().Contains(direction))
+        {
+            foldout.Add(CreateCopyToCardinalButton(direction));
+        }
 
         Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
         
@@ -141,6 +153,7 @@ public class Tile_Inspector : Editor
         {
             text = "Select All"
         };
+        button.style.flexGrow = 1;
         button.clicked += () =>
         {
             Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
@@ -161,6 +174,7 @@ public class Tile_Inspector : Editor
         {
             text = "Deselect All"
         };
+        button.style.flexGrow = 1;
         button.clicked += () =>
         {
             Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
@@ -173,6 +187,61 @@ public class Tile_Inspector : Editor
             serializedObject.ApplyModifiedProperties();
         };
         return button;
+    }
+
+    private VisualElement CreateCopyToAllButton(Direction direction)
+    {
+        var button = new Button()
+        {
+            text = "Copy to all directions"
+        };
+        button.clicked += () =>
+        {
+            CopyToDirections(direction, DirectionExtensions.GetDirections());
+            
+            serializedObject.ApplyModifiedProperties();
+        };
+        return button;
+    }
+    
+    private VisualElement CreateCopyToCardinalButton(Direction direction)
+    {
+        var button = new Button()
+        {
+            text = "Copy to cardinal directions"
+        };
+        button.clicked += () =>
+        {
+            CopyToDirections(direction, DirectionExtensions.GetCardinalDirections());
+            
+            serializedObject.ApplyModifiedProperties();
+        };
+        return button;
+    }
+
+    private void CopyToDirections(Direction sourceDirection, Direction[] targetDirections)
+    {
+        Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
+        var directionProperty = GetPropertyForDirection(sourceDirection);
+
+        List<Tile> tilesIncludingBorder = new List<Tile>(tileset.Tiles);
+        tilesIncludingBorder.Add(tileset.Border);
+            
+        foreach (var tile in tilesIncludingBorder)
+        {
+            var isSelected = IsTileInList(directionProperty, tile);
+            foreach (var otherDirection in targetDirections.Where(otherDirection => otherDirection != sourceDirection))
+            {
+                if (isSelected)
+                {
+                    SelectTile(tile, otherDirection);
+                }
+                else
+                {
+                    DeselectTile(tile, otherDirection);
+                }
+            }
+        }
     }
 
     private VisualElement CreateTileField(Tile neighborTile, Direction direction)

@@ -18,6 +18,8 @@ public static class DirectionExtensions
     
     public static Direction[] GetDirections() => new Direction[] {Direction.ABOVE, Direction.BELOW, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
+    public static Direction[] GetCardinalDirections() => new Direction[] {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+    
     public static Direction GetOpposite(this Direction dir)
     {
         return dir switch
