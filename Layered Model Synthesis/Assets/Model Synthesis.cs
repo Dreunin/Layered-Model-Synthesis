@@ -18,7 +18,7 @@ public class ModelSynthesis : MonoBehaviour
     
     [Header("Animation")]
     [SerializeField] private bool animate;
-    [SerializeField] float delayBetweenTilePlacement = 0.1f;
+    [SerializeField] float timeToAnimate = 10f;
     [SerializeField] GameObject poof;
 
     private HashSet<Possibility>[,,] possibilities;
@@ -234,7 +234,7 @@ public class ModelSynthesis : MonoBehaviour
                         for (int i = allowedByNeighbourPossibilities.Count - 1; i >= 0; i--)
                         {
                             Possibility p = allowedByNeighbourPossibilities.ElementAt(i);
-                            if (possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
+                            if (p.tile.allowRotation && possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
                             {
                                 allowedByNeighbourPossibilities.Remove(p);
                             }
@@ -339,11 +339,15 @@ public class ModelSynthesis : MonoBehaviour
     
     private IEnumerator AnimatePlaceTiles()
     {
-        foreach (Transform child in parentTransform)
+        float timePerChild = timeToAnimate / (height*length*width);
+        foreach (Transform layer in parentTransform)
         {
-            child.gameObject.SetActive(true);
-            Instantiate(poof, child.position, Quaternion.identity);
-            yield return new WaitForSeconds(delayBetweenTilePlacement);
+            foreach (Transform child in layer)
+            {
+                child.gameObject.SetActive(true);
+                Instantiate(poof, child.position, Quaternion.identity);
+                yield return new WaitForSeconds(timePerChild);
+            }
         }
     }
 }
