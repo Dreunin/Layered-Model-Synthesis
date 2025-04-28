@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileset: {fileID: 11400000, guid: b20693b64b30d2b49b8e6cd70f81c1ab, type: 2}
   allowedAboveList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}

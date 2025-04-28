@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileset: {fileID: 11400000, guid: b20693b64b30d2b49b8e6cd70f81c1ab, type: 2}
   allowedAboveList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: 6638298772880334903}

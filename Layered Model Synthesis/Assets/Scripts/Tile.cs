@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
+    [SerializeField] private Tileset tileset;
     [SerializeField] private List<Tile> allowedAboveList;
     [SerializeField] private List<Tile> allowedBelowList; //Since we go from top left to bottom right, we technically don't need to check the below tile
     [SerializeField] private List<Tile> allowedNorthList; //Since we go from top left to bottom right, we technically don't need to check the North tile
@@ -12,6 +13,7 @@ public class Tile : MonoBehaviour
     [SerializeField] private List<Tile> allowedWestList; //Since we go from top left to bottom right, we technically don't need to check the West tile
     public bool allowRotation;
     public bool sameRotationWhenStacked; //If true, the tile will always be rotated to the same rotation as the tile below it
+    
     public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedBelow { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedNorth { get; private set; } = new HashSet<Tile>();

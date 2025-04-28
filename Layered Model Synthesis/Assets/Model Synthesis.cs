@@ -10,18 +10,22 @@ using Random = UnityEngine.Random;
 [ExecuteAlways] //Always, since we might want to record the synthesis process in-game
 public class ModelSynthesis : MonoBehaviour
 {
-    [SerializeField] private List<Tile> tiles;
-    [SerializeField] bool synthesise;
+    [Header("Settings")]
+    [SerializeField] private Tileset tileset;
     [SerializeField] private int width;
     [SerializeField] private int length;
     [SerializeField] private int height;
+    
+    [Header("Animation")]
     [SerializeField] private bool animate;
     [SerializeField] float delayBetweenTilePlacement = 0.1f;
     [SerializeField] GameObject poof;
-    [SerializeField] private Tile border;
 
     private HashSet<Possibility>[,,] possibilities;
     private Transform parentTransform;
+
+    private List<Tile> tiles => tileset.Tiles;
+    private Tile border => tileset.Border;
 
     public class Possibility
     {
@@ -56,15 +60,6 @@ public class ModelSynthesis : MonoBehaviour
             return HashCode.Combine(tile, (int)rotation);
         }
     }
-
-    void Update()
-    {
-        if (synthesise)
-        {
-            synthesise = false;
-            BeginSynthesis();
-        }
-    }
     
     /// <summary>
     /// Checks whether a coordinate is inside the grid area
@@ -72,7 +67,7 @@ public class ModelSynthesis : MonoBehaviour
     /// <returns></returns>
     public bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
 
-    private void BeginSynthesis()
+    public void BeginSynthesis()
     {
         //If in editor, never animate
         if (animate && Application.isEditor && !Application.isPlaying)
