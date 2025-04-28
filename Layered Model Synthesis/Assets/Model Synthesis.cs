@@ -196,18 +196,18 @@ public class ModelSynthesis : MonoBehaviour
 
                 if (!InGrid(nx, ny, nz)) //Handle border
                 {
-                    /*HashSet<Tile> allowedByThis = new HashSet<Tile>();
-                    foreach (var tile in possibilities[x, y, z])
+                    HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
+                    foreach (var possibility in possibilities[x, y, z])
                     {
-                        if (tile.GetAllowed(d).Contains(border))
+                        if (possibility.tile.GetAllowed(d, possibility.rotation).Contains(border))
                         {
-                            allowedByThis.Add(tile);
+                            allowedByThis.Add(possibility);
                         }
                     }
-                    possibilities[x, y, z].IntersectWith(allowedByThis);*/
+                    possibilities[x, y, z].IntersectWith(allowedByThis);
                 
-                    HashSet<Possibility> allowedByNeighbour = PossibilitiesFromTiles(border.GetAllowed(d.GetOpposite()));
-                    possibilities[x, y, z].IntersectWith(allowedByNeighbour);
+                    // HashSet<Possibility> allowedByNeighbour = PossibilitiesFromTiles(border.GetAllowed(d.GetOpposite()));
+                    // possibilities[x, y, z].IntersectWith(allowedByNeighbour);
                 }
                 else // Normal tile
                 {
@@ -287,7 +287,7 @@ public class ModelSynthesis : MonoBehaviour
 
     private void InitializePossibilities()
     {
-        List<Possibility> allPossibleTiles = InitialPossibilities();
+        HashSet<Possibility> allPossibleTiles = PossibilitiesFromTiles(new HashSet<Tile>(tiles));
         possibilities = new HashSet<Possibility>[width, height, length];
         for (int x = 0; x < width; x++)
         {
@@ -299,28 +299,6 @@ public class ModelSynthesis : MonoBehaviour
                 }
             }
         }
-    }
-
-    public List<Possibility> InitialPossibilities()
-    {
-        //For each tile, create a possibility for each rotation if allowRotation is true
-        List<Possibility> allPossibleTiles = new List<Possibility>();
-        foreach (Tile tile in tiles)
-        {
-            if (tile.allowRotation)
-            {
-                allPossibleTiles.Add(new Possibility(tile, Rotation.zero));
-                allPossibleTiles.Add(new Possibility(tile, Rotation.ninety));
-                allPossibleTiles.Add(new Possibility(tile, Rotation.oneEighty));
-                allPossibleTiles.Add(new Possibility(tile, Rotation.twoSeventy));
-            }
-            else
-            {
-                allPossibleTiles.Add(new Possibility(tile, Rotation.zero));
-            }
-        }
-
-        return allPossibleTiles;
     }
 
     /// <summary>

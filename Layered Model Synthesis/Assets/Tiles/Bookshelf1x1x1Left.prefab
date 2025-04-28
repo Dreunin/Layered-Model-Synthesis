@@ -49,6 +49,7 @@ MonoBehaviour:
   allowedAboveList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: -7275378623634293086}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedBelowList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
@@ -59,7 +60,6 @@ MonoBehaviour:
   - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
-  - {fileID: 6640412011240929303, guid: 1a2ce40d183655243aff8990522cf526, type: 3}
   - {fileID: -6276556406107551574, guid: 21e6a26e04a65d14da02384034c38a34, type: 3}
   - {fileID: 6104773790594339738, guid: c9a659eebca92af409373375e8194edb, type: 3}
   - {fileID: 2094558542846813651, guid: d67f8c2e503aee44facfab733c6f7937, type: 3}
@@ -73,7 +73,7 @@ MonoBehaviour:
   - {fileID: 2094558542846813651, guid: d67f8c2e503aee44facfab733c6f7937, type: 3}
   - {fileID: 6104773790594339738, guid: c9a659eebca92af409373375e8194edb, type: 3}
   - {fileID: -6276556406107551574, guid: 21e6a26e04a65d14da02384034c38a34, type: 3}
-  - {fileID: 6640412011240929303, guid: 1a2ce40d183655243aff8990522cf526, type: 3}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedWestList:
   - {fileID: 5286576627878375482, guid: c0358b70331dc8d4ba30dde08dfc61f1, type: 3}
   - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
@@ -82,7 +82,7 @@ MonoBehaviour:
   - {fileID: 2094558542846813651, guid: d67f8c2e503aee44facfab733c6f7937, type: 3}
   - {fileID: 6104773790594339738, guid: c9a659eebca92af409373375e8194edb, type: 3}
   - {fileID: -6276556406107551574, guid: 21e6a26e04a65d14da02384034c38a34, type: 3}
-  - {fileID: 6640412011240929303, guid: 1a2ce40d183655243aff8990522cf526, type: 3}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowRotation: 1
   sameRotationWhenStacked: 1
 --- !u!1001 &3028689820345983888
