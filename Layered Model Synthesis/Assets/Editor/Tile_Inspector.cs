@@ -15,6 +15,7 @@ public class Tile_Inspector : Editor
     SerializedProperty tilesetProp;
     SerializedProperty allowRotationProp;
     SerializedProperty sameRotationWhenStackedProp;
+    SerializedProperty allowFreeRotationProp;
     SerializedProperty allowedAboveProp;
     SerializedProperty allowedBelowProp;
     SerializedProperty allowedNorthProp;
@@ -27,6 +28,7 @@ public class Tile_Inspector : Editor
         // Find all properties
         tilesetProp = serializedObject.FindProperty("tileset");
         allowRotationProp = serializedObject.FindProperty("allowRotation");
+        allowFreeRotationProp = serializedObject.FindProperty("allowFreeRotation");
         sameRotationWhenStackedProp = serializedObject.FindProperty("sameRotationWhenStacked");
         allowedAboveProp = serializedObject.FindProperty("allowedAboveList");
         allowedBelowProp = serializedObject.FindProperty("allowedBelowList");
@@ -44,6 +46,7 @@ public class Tile_Inspector : Editor
         root.Add(CreateTilesetField());
         root.Add(CreateRotationField());
         root.Add(CreateStackedField());
+        root.Add(CreateFreeRotationField());
 
         root.Add(CreateHeader("Allowed Neighbours"));
         
@@ -99,6 +102,13 @@ public class Tile_Inspector : Editor
         var rotationField = new PropertyField(allowRotationProp, "Allow Rotation");
         rotationField.AddToClassList("unity-base-field__aligned");
         return rotationField;
+    }
+    
+    private VisualElement CreateFreeRotationField()
+    {
+        var freeRotationField = new PropertyField(allowFreeRotationProp, "Allow Free 360 Rotation");
+        freeRotationField.AddToClassList("unity-base-field__aligned");
+        return freeRotationField;
     }
     
     private VisualElement CreateStackedField()

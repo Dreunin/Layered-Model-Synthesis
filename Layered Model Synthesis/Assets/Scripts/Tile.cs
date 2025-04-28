@@ -13,6 +13,8 @@ public class Tile : MonoBehaviour
     [SerializeField] public List<Tile> allowedWestList; //Since we go from top left to bottom right, we technically don't need to check the West tile
     public bool allowRotation;
     public bool sameRotationWhenStacked; //If true, the tile will always be rotated to the same rotation as the tile below it
+    public bool allowFreeRotation; //If true, the tile will be randomly rotated upon placement (can't be used with allowRotation)
+    
     
     public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedBelow { get; private set; } = new HashSet<Tile>();
@@ -33,6 +35,12 @@ public class Tile : MonoBehaviour
         if (tileset != null && !tileset.Tiles.Contains(this))
         {
             Debug.LogWarning($"Tile {name} is set to belong to tileset {tileset.name}, but the tileset does not include {name}");
+        }
+        
+        if(allowFreeRotation && allowRotation)
+        {
+            Debug.LogWarning($"Tile {name} has both allowFreeRotation and allowRotation set to true. This is not allowed.");
+            allowFreeRotation = false;
         }
     }
     

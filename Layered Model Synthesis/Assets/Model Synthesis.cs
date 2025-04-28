@@ -334,6 +334,7 @@ public class ModelSynthesis : MonoBehaviour
     {
         Tile newTile = Instantiate(possibility.tile, new Vector3(x, y, z), possibility.GetRotation());
         newTile.transform.SetParent(parent);
+        if(possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
         if(animate) newTile.gameObject.SetActive(false);
     }
     
