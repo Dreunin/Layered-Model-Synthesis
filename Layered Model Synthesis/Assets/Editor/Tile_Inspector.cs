@@ -15,6 +15,8 @@ public class Tile_Inspector : Editor
     SerializedProperty tilesetProp;
     SerializedProperty allowRotationProp;
     SerializedProperty sameRotationWhenStackedProp;
+    SerializedProperty allowFreeRotationProp;
+    SerializedProperty dontInstantiateProp;
     SerializedProperty allowedAboveProp;
     SerializedProperty allowedBelowProp;
     SerializedProperty allowedNorthProp;
@@ -28,6 +30,8 @@ public class Tile_Inspector : Editor
         tilesetProp = serializedObject.FindProperty("tileset");
         allowRotationProp = serializedObject.FindProperty("allowRotation");
         sameRotationWhenStackedProp = serializedObject.FindProperty("sameRotationWhenStacked");
+        allowFreeRotationProp = serializedObject.FindProperty("allowFreeRotation");
+        dontInstantiateProp = serializedObject.FindProperty("dontInstantiate");
         allowedAboveProp = serializedObject.FindProperty("allowedAboveList");
         allowedBelowProp = serializedObject.FindProperty("allowedBelowList");
         allowedNorthProp = serializedObject.FindProperty("allowedNorthList");
@@ -44,6 +48,8 @@ public class Tile_Inspector : Editor
         root.Add(CreateTilesetField());
         root.Add(CreateRotationField());
         root.Add(CreateStackedField());
+        root.Add(CreateFreeRotationField());
+        root.Add(CreateDontInstantiateField());
 
         root.Add(CreateHeader("Allowed Neighbours"));
         
@@ -101,11 +107,25 @@ public class Tile_Inspector : Editor
         return rotationField;
     }
     
+    private VisualElement CreateFreeRotationField()
+    {
+        var freeRotationField = new PropertyField(allowFreeRotationProp, "Allow Free 360 Rotation");
+        freeRotationField.AddToClassList("unity-base-field__aligned");
+        return freeRotationField;
+    }
+    
     private VisualElement CreateStackedField()
     {
         var stackedField = new PropertyField(sameRotationWhenStackedProp, "Same Rotation When Stacked");
         stackedField.AddToClassList("unity-base-field__aligned");
         return stackedField;
+    }
+    
+    private VisualElement CreateDontInstantiateField()
+    {
+        var dontInstantiateField = new PropertyField(dontInstantiateProp, "Don't Instantiate");
+        dontInstantiateField.AddToClassList("unity-base-field__aligned");
+        return dontInstantiateField;
     }
 
     private VisualElement CreateDirectionFoldout(Direction direction)
