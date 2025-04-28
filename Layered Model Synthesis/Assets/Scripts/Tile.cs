@@ -14,6 +14,7 @@ public class Tile : MonoBehaviour
     public bool allowRotation;
     public bool sameRotationWhenStacked; //If true, the tile will always be rotated to the same rotation as the tile below it
     public bool allowFreeRotation; //If true, the tile will be randomly rotated upon placement (can't be used with allowRotation)
+    public bool dontInstantiate; //If true, the tile will not be instantiated when placed (i.e. only used for neighbour logic)
     
     
     public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();

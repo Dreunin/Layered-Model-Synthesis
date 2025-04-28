@@ -162,3 +162,5 @@ MonoBehaviour:
   - {fileID: 6640412011240929303, guid: 1a2ce40d183655243aff8990522cf526, type: 3}
   allowRotation: 0
   sameRotationWhenStacked: 0
+  allowFreeRotation: 0
+  dontInstantiate: 1

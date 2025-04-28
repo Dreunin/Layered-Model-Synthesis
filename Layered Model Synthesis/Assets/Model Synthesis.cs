@@ -332,6 +332,7 @@ public class ModelSynthesis : MonoBehaviour
     /// <param name="tile"></param>
     private void PlaceTile(int x, int y, int z, Possibility possibility, Transform parent)
     {
+        if(possibility.tile.dontInstantiate) return; //If the tile is not supposed to be instantiated, we don't
         Tile newTile = Instantiate(possibility.tile, new Vector3(x, y, z), possibility.GetRotation());
         newTile.transform.SetParent(parent);
         if(possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
