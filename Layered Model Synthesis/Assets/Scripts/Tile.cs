@@ -29,6 +29,11 @@ public class Tile : MonoBehaviour
         allowedEast  = new HashSet<Tile>(allowedEastList);
         allowedSouth = new HashSet<Tile>(allowedSouthList);
         allowedWest  = new HashSet<Tile>(allowedWestList);
+
+        if (tileset != null && !tileset.Tiles.Contains(this))
+        {
+            Debug.LogWarning($"Tile {name} is set to belong to tileset {tileset.name}, but the tileset does not include {name}");
+        }
     }
     
     public HashSet<Tile> GetAllowed(Direction dir, Rotation rot = Rotation.zero)
