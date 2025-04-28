@@ -360,6 +360,7 @@ MonoBehaviour:
   allowRotation: 0
   sameRotationWhenStacked: 0
   allowFreeRotation: 1
+  dontInstantiate: 0
 --- !u!1 &7034690472070880982
 GameObject:
   m_ObjectHideFlags: 0

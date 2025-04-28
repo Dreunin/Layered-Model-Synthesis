@@ -246,6 +246,8 @@ MonoBehaviour:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   allowRotation: 0
   sameRotationWhenStacked: 0
+  allowFreeRotation: 0
+  dontInstantiate: 0
 --- !u!1 &8533918553941851459
 GameObject:
   m_ObjectHideFlags: 0

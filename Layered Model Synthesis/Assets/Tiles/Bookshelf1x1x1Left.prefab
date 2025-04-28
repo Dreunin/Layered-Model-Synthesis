@@ -85,6 +85,8 @@ MonoBehaviour:
   - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowRotation: 1
   sameRotationWhenStacked: 1
+  allowFreeRotation: 0
+  dontInstantiate: 0
 --- !u!1001 &3028689820345983888
 PrefabInstance:
   m_ObjectHideFlags: 0

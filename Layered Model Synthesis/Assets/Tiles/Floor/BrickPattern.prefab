@@ -164,18 +164,26 @@ MonoBehaviour:
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
   - {fileID: 2094558542846813651, guid: d67f8c2e503aee44facfab733c6f7937, type: 3}
   - {fileID: 6104773790594339738, guid: c9a659eebca92af409373375e8194edb, type: 3}
-  allowedBelowList: []
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
+  allowedBelowList:
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedNorthList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedEastList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedSouthList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedWestList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
+  - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowRotation: 0
   sameRotationWhenStacked: 0
+  allowFreeRotation: 0
+  dontInstantiate: 0

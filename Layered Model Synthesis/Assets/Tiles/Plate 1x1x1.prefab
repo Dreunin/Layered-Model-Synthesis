@@ -190,3 +190,4 @@ MonoBehaviour:
   allowRotation: 0
   sameRotationWhenStacked: 0
   allowFreeRotation: 1
+  dontInstantiate: 0
