@@ -114,6 +114,9 @@ public class Tile_Inspector : Editor
             text = direction.GetName(),
             viewDataKey = $"{target.name}_{direction}"
         };
+        
+        foldout.Add(CreateSelectAllButton(direction));
+        foldout.Add(CreateDeselectAllButton(direction));
 
         Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
         
@@ -130,6 +133,46 @@ public class Tile_Inspector : Editor
         }
         
         return foldout;
+    }
+
+    private VisualElement CreateSelectAllButton(Direction direction)
+    {
+        var button = new Button()
+        {
+            text = "Select All"
+        };
+        button.clicked += () =>
+        {
+            Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
+            SelectTile(tileset.Border, direction);
+            foreach (Tile tile in tileset.Tiles)
+            {
+                SelectTile(tile, direction);
+            }
+            
+            serializedObject.ApplyModifiedProperties();
+        };
+        return button;
+    }
+    
+    private VisualElement CreateDeselectAllButton(Direction direction)
+    {
+        var button = new Button()
+        {
+            text = "Deselect All"
+        };
+        button.clicked += () =>
+        {
+            Tileset tileset = tilesetProp.objectReferenceValue as Tileset;
+            DeselectTile(tileset.Border, direction);
+            foreach (Tile tile in tileset.Tiles)
+            {
+                DeselectTile(tile, direction);
+            }
+            
+            serializedObject.ApplyModifiedProperties();
+        };
+        return button;
     }
 
     private VisualElement CreateTileField(Tile neighborTile, Direction direction)
@@ -150,50 +193,11 @@ public class Tile_Inspector : Editor
             
             if (evt.newValue)
             {
-                // Add tile to the list if not already present
-                if (!IsTileInList(listProperty, neighborTile))
-                {
-                    listProperty.InsertArrayElementAtIndex(listProperty.arraySize);
-                    SerializedProperty element = listProperty.GetArrayElementAtIndex(listProperty.arraySize - 1);
-                    element.objectReferenceValue = neighborTile;
-                }
-                
-                // Add to the other tiles opposite direction
-                if (neighborTile == target)
-                {
-                    var oppositeListProperty = GetPropertyForDirection(direction.GetOpposite()); 
-                    if (!IsTileInList(oppositeListProperty, neighborTile))
-                    {
-                        oppositeListProperty.InsertArrayElementAtIndex(oppositeListProperty.arraySize);
-                        SerializedProperty element = oppositeListProperty.GetArrayElementAtIndex(oppositeListProperty.arraySize - 1);
-                        element.objectReferenceValue = neighborTile;
-                    }
-                }
-                else
-                {
-                    var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
-                    if (!otherList.Contains((Tile) target))
-                    {
-                        otherList.Add((Tile) target);
-                    }
-                }
+                SelectTile(neighborTile, direction);
             }
             else
             {
-                // Remove tile from the list
-                RemoveTileFromList(listProperty, neighborTile);
-                
-                // Remove from the other tiles opposite direction
-                if (neighborTile == target)
-                {
-                    var oppositeListProperty = GetPropertyForDirection(direction.GetOpposite());
-                    RemoveTileFromList(oppositeListProperty, neighborTile);                    
-                }
-                else
-                {
-                    var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
-                    otherList.Remove((Tile) target);
-                }
+                DeselectTile(neighborTile, direction);
             }
             
             serializedObject.ApplyModifiedProperties();
@@ -207,7 +211,60 @@ public class Tile_Inspector : Editor
         
         return toggle;
     }
-    
+
+    private void DeselectTile(Tile neighborTile, Direction direction)
+    {
+        SerializedProperty listProperty = GetPropertyForDirection(direction);
+        
+        // Remove tile from the list
+        RemoveTileFromList(listProperty, neighborTile);
+                
+        // Remove from the other tiles opposite direction
+        if (neighborTile == target)
+        {
+            var oppositeListProperty = GetPropertyForDirection(direction.GetOpposite());
+            RemoveTileFromList(oppositeListProperty, neighborTile);                    
+        }
+        else
+        {
+            var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
+            otherList.Remove((Tile) target);
+        }
+    }
+
+    private void SelectTile(Tile neighborTile, Direction direction)
+    {
+        SerializedProperty listProperty = GetPropertyForDirection(direction);
+        
+        // Add tile to the list if not already present
+        if (!IsTileInList(listProperty, neighborTile))
+        {
+            listProperty.InsertArrayElementAtIndex(listProperty.arraySize);
+            SerializedProperty element = listProperty.GetArrayElementAtIndex(listProperty.arraySize - 1);
+            element.objectReferenceValue = neighborTile;
+        }
+
+        // Add to the other tiles opposite direction
+        if (neighborTile == target)
+        {
+            var oppositeListProperty = GetPropertyForDirection(direction.GetOpposite()); 
+            if (!IsTileInList(oppositeListProperty, neighborTile))
+            {
+                oppositeListProperty.InsertArrayElementAtIndex(oppositeListProperty.arraySize);
+                SerializedProperty element = oppositeListProperty.GetArrayElementAtIndex(oppositeListProperty.arraySize - 1);
+                element.objectReferenceValue = neighborTile;
+            }
+        }
+        else
+        {
+            var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
+            if (!otherList.Contains((Tile) target))
+            {
+                otherList.Add((Tile) target);
+            }
+        }
+    }
+
     private SerializedProperty GetPropertyForDirection(Direction direction)
     {
         return direction switch
