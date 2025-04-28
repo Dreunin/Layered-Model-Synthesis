@@ -11,6 +11,8 @@ public class Tile_Inspector : Editor
     public VisualTreeAsset inspectorXML;
     
     SerializedProperty tilesetProp;
+    SerializedProperty allowRotationProp;
+    SerializedProperty sameRotationWhenStackedProp;
     SerializedProperty allowedAboveProp;
     SerializedProperty allowedBelowProp;
     SerializedProperty allowedNorthProp;
@@ -24,6 +26,8 @@ public class Tile_Inspector : Editor
     {
         // Find all properties
         tilesetProp = serializedObject.FindProperty("tileset");
+        allowRotationProp = serializedObject.FindProperty("allowRotation");
+        sameRotationWhenStackedProp = serializedObject.FindProperty("sameRotationWhenStacked");
         allowedAboveProp = serializedObject.FindProperty("allowedAboveList");
         allowedBelowProp = serializedObject.FindProperty("allowedBelowList");
         allowedNorthProp = serializedObject.FindProperty("allowedNorthList");
@@ -36,8 +40,10 @@ public class Tile_Inspector : Editor
     {
         VisualElement root = new VisualElement();
         
-        // Add the tileset field
+        // Add the property fields
         root.Add(CreateTilesetField());
+        root.Add(CreateRotationField());
+        root.Add(CreateStackedField());
 
         if (tilesetProp.objectReferenceValue == null)
         {
@@ -74,6 +80,20 @@ public class Tile_Inspector : Editor
         });
         
         return propertyField;
+    }
+
+    private VisualElement CreateRotationField()
+    {
+        var rotationField = new PropertyField(allowRotationProp, "Allow Rotation");
+        rotationField.AddToClassList("unity-base-field__aligned");
+        return rotationField;
+    }
+    
+    private VisualElement CreateStackedField()
+    {
+        var stackedField = new PropertyField(sameRotationWhenStackedProp, "Same Rotation When Stacked");
+        stackedField.AddToClassList("unity-base-field__aligned");
+        return stackedField;
     }
 
     private VisualElement CreateDirectionFoldout(Direction direction)
