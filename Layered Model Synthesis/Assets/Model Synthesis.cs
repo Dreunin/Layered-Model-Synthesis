@@ -234,7 +234,7 @@ public class ModelSynthesis : MonoBehaviour
                         for (int i = allowedByNeighbourPossibilities.Count - 1; i >= 0; i--)
                         {
                             Possibility p = allowedByNeighbourPossibilities.ElementAt(i);
-                            if (possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
+                            if (p.tile.allowRotation && possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
                             {
                                 allowedByNeighbourPossibilities.Remove(p);
                             }
