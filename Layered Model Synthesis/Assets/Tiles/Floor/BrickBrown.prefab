@@ -122,6 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileset: {fileID: 0}
   allowedAboveList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
@@ -143,6 +144,7 @@ MonoBehaviour:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
   allowRotation: 0
+  sameRotationWhenStacked: 0
 --- !u!1 &6952868549464905290
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,6 +198,8 @@ MonoBehaviour:
   - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
   - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
+  - {fileID: 2094558542846813651, guid: d67f8c2e503aee44facfab733c6f7937, type: 3}
+  - {fileID: 6104773790594339738, guid: c9a659eebca92af409373375e8194edb, type: 3}
   allowedBelowList: []
   allowedNorthList:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
@@ -210,3 +214,4 @@ MonoBehaviour:
   - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
   - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
   allowRotation: 0
+  sameRotationWhenStacked: 0
