@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 [CustomEditor(typeof(Tile))]
@@ -17,6 +18,8 @@ public class Tile_Inspector : Editor
     SerializedProperty sameRotationWhenStackedProp;
     SerializedProperty allowFreeRotationProp;
     SerializedProperty dontInstantiateProp;
+    SerializedProperty weightProp;
+    
     SerializedProperty allowedAboveProp;
     SerializedProperty allowedBelowProp;
     SerializedProperty allowedNorthProp;
@@ -32,6 +35,8 @@ public class Tile_Inspector : Editor
         sameRotationWhenStackedProp = serializedObject.FindProperty("sameRotationWhenStacked");
         allowFreeRotationProp = serializedObject.FindProperty("allowFreeRotation");
         dontInstantiateProp = serializedObject.FindProperty("dontInstantiate");
+        weightProp = serializedObject.FindProperty("weight");
+        
         allowedAboveProp = serializedObject.FindProperty("allowedAboveList");
         allowedBelowProp = serializedObject.FindProperty("allowedBelowList");
         allowedNorthProp = serializedObject.FindProperty("allowedNorthList");
@@ -50,6 +55,7 @@ public class Tile_Inspector : Editor
         root.Add(CreateStackedField());
         root.Add(CreateFreeRotationField());
         root.Add(CreateDontInstantiateField());
+        root.Add(CreateWeightField());
 
         root.Add(CreateHeader("Allowed Neighbours"));
         
@@ -126,6 +132,13 @@ public class Tile_Inspector : Editor
         var dontInstantiateField = new PropertyField(dontInstantiateProp, "Don't Instantiate");
         dontInstantiateField.AddToClassList("unity-base-field__aligned");
         return dontInstantiateField;
+    }
+    
+    private VisualElement CreateWeightField()
+    {
+        var field = new PropertyField(weightProp, "Weight");
+        field.AddToClassList("unity-base-field__aligned");
+        return field;
     }
 
     private VisualElement CreateDirectionFoldout(Direction direction)

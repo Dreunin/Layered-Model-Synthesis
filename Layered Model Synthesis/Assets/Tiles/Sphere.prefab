@@ -189,3 +189,4 @@ MonoBehaviour:
   sameRotationWhenStacked: 0
   allowFreeRotation: 1
   dontInstantiate: 0
+  weight: 0.05

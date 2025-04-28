@@ -91,6 +91,7 @@ MonoBehaviour:
   sameRotationWhenStacked: 1
   allowFreeRotation: 0
   dontInstantiate: 0
+  weight: 0.25
 --- !u!1001 &8246738085454729392
 PrefabInstance:
   m_ObjectHideFlags: 0

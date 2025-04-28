@@ -2,9 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 [ExecuteAlways] //Always, since we might want to record the synthesis process in-game
@@ -146,12 +144,29 @@ public class ModelSynthesis : MonoBehaviour
     private Possibility Observe(int x, int y, int z)
     {
         if (!InGrid(x, y, z)) return null;
-        Possibility observed = possibilities[x, y, z].ElementAt(Random.Range(0, possibilities[x, y, z].Count));
+        Possibility observed = PossibilityBasedOnWeight(x, y, z);
         possibilities[x, y, z].Clear();
         possibilities[x, y, z].Add(observed);
         return observed;
     }
 
+    private Possibility PossibilityBasedOnWeight(int x, int y, int z)
+    {
+        Possibility[] pos = possibilities[x, y, z].ToArray();
+        float totalWeight = pos.Sum(p => p.tile.weight);
+        float randomWeight = Random.Range(0, totalWeight);
+        float runningWeight = 0;
+        foreach (var p in pos)
+        {
+            runningWeight += p.tile.weight;
+            if (randomWeight <= runningWeight)
+            {
+                return p;
+            }
+        }
+
+        throw new Exception("Failed to pick a possibility");
+    }
 
     private void Propagate(int x, int y, int z, bool propagateFromSelf = false)
     {

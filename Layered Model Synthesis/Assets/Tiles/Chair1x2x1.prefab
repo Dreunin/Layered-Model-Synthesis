@@ -523,6 +523,7 @@ MonoBehaviour:
   sameRotationWhenStacked: 0
   allowFreeRotation: 0
   dontInstantiate: 0
+  weight: 0.1
 --- !u!1 &6569066097654756412
 GameObject:
   m_ObjectHideFlags: 0
