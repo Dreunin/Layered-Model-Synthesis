@@ -30,6 +30,7 @@ public class ModelSynthesis : MonoBehaviour
         public Tile tile;
         public Rotation rotation;
         public bool root = true;
+        public bool placed = false;
 
         public Possibility(Tile tile, Rotation rotation)
         {
@@ -91,9 +92,18 @@ public class ModelSynthesis : MonoBehaviour
     /// </summary>
     private void Synthesise()
     {
+        var test1 = new Possibility(tileset.Tiles.First(), 0);
+        var test2 = new Possibility(tileset.Tiles.First(), 0)
+        {
+            placed = true
+        };
+        var set1 = new HashSet<Possibility>() { test1 };
+        var set2 = new HashSet<Possibility>() { test2 };
+        Debug.Log($"intersection: {set1.Intersect(set2).Count()}");
+        
         parentTransform = new GameObject("Room").transform;
 
-        MassPropagate();
+        //MassPropagate();
         
         for (int y = 0; y < height; y++)
         {
@@ -108,9 +118,14 @@ public class ModelSynthesis : MonoBehaviour
                         Debug.LogError($"No possibilities left at ({x}, {y}, {z})");
                         return;
                     }
+
+                    if (possibilities[x, y, z].First().placed)
+                    {
+                        continue;
+                    }
                     
+                    Propagate(x, y, z, true);
                     Possibility newTile = Observe(x, y, z);
-                    Propagate(x, y, z);
                     PlaceTile(x, y, z, newTile,layerTransform);
                 }
             }
@@ -146,12 +161,31 @@ public class ModelSynthesis : MonoBehaviour
     {
         if (!InGrid(x, y, z)) return null;
         Possibility observed = PossibilityBasedOnWeight(x, y, z);
-        if (observed.tile.IsCustomSize)
+        if (observed.tile.IsCustomSize) //If multitile, we need to observe the other grid point the tile fills
         {
-            // Also update possibilities for other cells
+            for (int i = 0; i < observed.tile.customSize.x; i++)
+            {
+                for (int j = 0; j < observed.tile.customSize.y; j++)
+                {
+                    for (int k = 0; k < observed.tile.customSize.z; k++)
+                    {
+                        var p = new Possibility(observed.tile, observed.rotation)
+                        {
+                            placed = true,
+                            root = i == 0 && j == 0 && k == 0
+                        };
+                        possibilities[x + i, y + j, z + k].Clear();
+                        possibilities[x + i, y + j, z + k].Add(p);
+                    }
+                }
+            }
         }
-        possibilities[x, y, z].Clear();
-        possibilities[x, y, z].Add(observed);
+        else
+        {
+            observed.placed = true;
+            possibilities[x, y, z].Clear();
+            possibilities[x, y, z].Add(observed);
+        }
         return observed;
     }
 
@@ -195,14 +229,17 @@ public class ModelSynthesis : MonoBehaviour
         {
             q.Push((x, y, z)); // Start with the initial tile
         }
+
+        int originalX = x;
+        int originalY = y;
+        int originalZ = z;
         
         while (q.Count > 0)
         {
             (x, y, z) = q.Pop();
             if (possibilities[x, y, z].Count == 0)
             {
-                Debug.LogError($"No possibilities left when trying to propagate at {x}/{y}/{z}");
-                return;
+                throw new Exception($"No possibilities left at ({x}, {y}, {z}). Originally propagating from ({originalX}, {originalY}, {originalZ}).");
             }
 
             int countBefore = possibilities[x, y, z].Count; //Used to check if we need to propagate again
@@ -234,6 +271,11 @@ public class ModelSynthesis : MonoBehaviour
                     /*HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
                     foreach (var possibility in possibilities[x, y, z]) //Check if the tile at (x,y,z) allows the tile at (nx,ny,nz)
                     {
+                        if (possibility.tile.IsCustomSize && possibilities[nx, ny, nz].Contains(possibility) &&
+                            possibilities[nx, ny, nz].Count != 1)
+                        {
+                            allowedByThis.Add(possibility);
+                        }
                         if (possibilities[nx, ny, nz].Intersect(PossibilitiesFromTiles(possibility.tile.GetAllowed(d,possibility.rotation))).Any())
                         {
                             allowedByThis.Add(possibility);
@@ -272,7 +314,7 @@ public class ModelSynthesis : MonoBehaviour
             //Multi-tile tiles
             foreach (Possibility p in possibilities[x, y, z])
             {
-                if (p.tile.customSize == Vector3Int.one) continue;
+                if (!p.tile.IsCustomSize) continue;
                 
                 bool failed = false;
                 for (int i = 0; i < p.tile.customSize.x; i++)
@@ -337,7 +379,6 @@ public class ModelSynthesis : MonoBehaviour
 
     private void InitializePossibilities()
     {
-        HashSet<Possibility> allPossibleTiles = PossibilitiesFromTiles(new HashSet<Tile>(tiles));
         possibilities = new HashSet<Possibility>[width, height, length];
         for (int x = 0; x < width; x++)
         {
@@ -345,6 +386,7 @@ public class ModelSynthesis : MonoBehaviour
             {
                 for (int z = 0; z < length; z++)
                 {
+                    HashSet<Possibility> allPossibleTiles = PossibilitiesFromTiles(new HashSet<Tile>(tiles));
                     possibilities[x, y, z] = new HashSet<Possibility>(allPossibleTiles);
                 }
             }
@@ -361,7 +403,8 @@ public class ModelSynthesis : MonoBehaviour
     private void PlaceTile(int x, int y, int z, Possibility possibility, Transform parent)
     {
         if(possibility.tile.dontInstantiate) return; //If the tile is not supposed to be instantiated, we don't
-        Tile newTile = Instantiate(possibility.tile, new Vector3(x, y, z), possibility.GetRotation());
+        Vector3 placement = new Vector3(x, y, z) + new Vector3(possibility.tile.customSize.x-1,0, possibility.tile.customSize.z-1) / 2f;
+        Tile newTile = Instantiate(possibility.tile, placement, possibility.GetRotation());
         newTile.transform.SetParent(parent);
         if(possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
         if(animate) newTile.gameObject.SetActive(false);

@@ -19,7 +19,7 @@ public class Tile : MonoBehaviour
     public float weight = 0.5f; //The weight of the tile, used for random selection
     public Vector3Int customSize = new Vector3Int(1, 1, 1);
 
-    public bool IsCustomSize => customSize == Vector3.one;
+    public bool IsCustomSize => customSize != Vector3Int.one;
     
     public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedBelow { get; private set; } = new HashSet<Tile>();
