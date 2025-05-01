@@ -17,6 +17,9 @@ public class Tile : MonoBehaviour
     public bool dontInstantiate; //If true, the tile will not be instantiated when placed (i.e. only used for neighbour logic)
     [Range(0.05f, 1f)]
     public float weight = 0.5f; //The weight of the tile, used for random selection
+    public Vector3Int customSize = new Vector3Int(1, 1, 1);
+
+    public bool IsCustomSize => customSize == Vector3.one;
     
     public HashSet<Tile> allowedAbove { get; private set; } = new HashSet<Tile>();
     public HashSet<Tile> allowedBelow { get; private set; } = new HashSet<Tile>();

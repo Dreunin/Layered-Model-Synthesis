@@ -29,6 +29,7 @@ public class ModelSynthesis : MonoBehaviour
     {
         public Tile tile;
         public Rotation rotation;
+        public bool root = true;
 
         public Possibility(Tile tile, Rotation rotation)
         {
@@ -145,6 +146,10 @@ public class ModelSynthesis : MonoBehaviour
     {
         if (!InGrid(x, y, z)) return null;
         Possibility observed = PossibilityBasedOnWeight(x, y, z);
+        if (observed.tile.IsCustomSize)
+        {
+            // Also update possibilities for other cells
+        }
         possibilities[x, y, z].Clear();
         possibilities[x, y, z].Add(observed);
         return observed;
@@ -152,7 +157,7 @@ public class ModelSynthesis : MonoBehaviour
 
     private Possibility PossibilityBasedOnWeight(int x, int y, int z)
     {
-        Possibility[] pos = possibilities[x, y, z].ToArray();
+        var pos = possibilities[x, y, z].ToArray().Where(p => p.root).ToArray();
         float totalWeight = pos.Sum(p => p.tile.weight);
         float randomWeight = Random.Range(0, totalWeight);
         float runningWeight = 0;
@@ -226,7 +231,7 @@ public class ModelSynthesis : MonoBehaviour
                 }
                 else // Normal tile
                 {
-                    HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
+                    /*HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
                     foreach (var possibility in possibilities[x, y, z]) //Check if the tile at (x,y,z) allows the tile at (nx,ny,nz)
                     {
                         if (possibilities[nx, ny, nz].Intersect(PossibilitiesFromTiles(possibility.tile.GetAllowed(d,possibility.rotation))).Any())
@@ -234,11 +239,15 @@ public class ModelSynthesis : MonoBehaviour
                             allowedByThis.Add(possibility);
                         }
                     }
-                    possibilities[x, y, z].IntersectWith(allowedByThis);
+                    possibilities[x, y, z].IntersectWith(allowedByThis);*/
                     
                     HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
                     foreach (var possibility in possibilities[nx, ny, nz]) //Check if the tile at (nx,ny,nz) allows the tile at (x,y,z)
                     {
+                        if (possibility.tile.IsCustomSize && possibilities[nx, ny, nz].Count != 1)
+                        {
+                            allowedByNeighbour.Add(possibility.tile);
+                        }
                         allowedByNeighbour.UnionWith(possibility.tile.GetAllowed(d.GetOpposite(),possibility.rotation));
                     }
                     HashSet<Possibility> allowedByNeighbourPossibilities = PossibilitiesFromTiles(allowedByNeighbour);
@@ -257,6 +266,32 @@ public class ModelSynthesis : MonoBehaviour
                     }
                     
                     possibilities[x, y, z].IntersectWith(allowedByNeighbourPossibilities);
+                }
+            }
+            
+            //Multi-tile tiles
+            foreach (Possibility p in possibilities[x, y, z])
+            {
+                if (p.tile.customSize == Vector3Int.one) continue;
+                
+                bool failed = false;
+                for (int i = 0; i < p.tile.customSize.x; i++)
+                {
+                    for (int j = 0; j < p.tile.customSize.y; j++)
+                    {
+                        for (int k = 0; k < p.tile.customSize.z; k++)
+                        {
+                            //If in grid and possibilities contains same tile as non-root
+                            if(!InGrid(x+i, y+j, z+k) || !possibilities[x+i,y+j,z+k].Contains(p))
+                            {
+                                p.root = false;
+                                failed = true;
+                                break;
+                            }
+                        }
+                        if (failed) break;
+                    }
+                    if (failed) break;
                 }
             }
             

@@ -19,6 +19,7 @@ public class Tile_Inspector : Editor
     SerializedProperty allowFreeRotationProp;
     SerializedProperty dontInstantiateProp;
     SerializedProperty weightProp;
+    SerializedProperty multiTileProp;
     
     SerializedProperty allowedAboveProp;
     SerializedProperty allowedBelowProp;
@@ -36,6 +37,7 @@ public class Tile_Inspector : Editor
         allowFreeRotationProp = serializedObject.FindProperty("allowFreeRotation");
         dontInstantiateProp = serializedObject.FindProperty("dontInstantiate");
         weightProp = serializedObject.FindProperty("weight");
+        multiTileProp = serializedObject.FindProperty("customSize");
         
         allowedAboveProp = serializedObject.FindProperty("allowedAboveList");
         allowedBelowProp = serializedObject.FindProperty("allowedBelowList");
@@ -56,6 +58,7 @@ public class Tile_Inspector : Editor
         root.Add(CreateFreeRotationField());
         root.Add(CreateDontInstantiateField());
         root.Add(CreateWeightField());
+        root.Add(CreateMultiTileField());
 
         root.Add(CreateHeader("Allowed Neighbours"));
         
@@ -137,6 +140,13 @@ public class Tile_Inspector : Editor
     private VisualElement CreateWeightField()
     {
         var field = new PropertyField(weightProp, "Weight");
+        field.AddToClassList("unity-base-field__aligned");
+        return field;
+    }
+    
+    private VisualElement CreateMultiTileField()
+    {
+        var field = new PropertyField(multiTileProp, "Multi Tile");
         field.AddToClassList("unity-base-field__aligned");
         return field;
     }
