@@ -339,8 +339,11 @@ public class Tile_Inspector : Editor
         }
         else
         {
-            var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
-            otherList.Remove((Tile) target);
+            var serializedNeighbor = new SerializedObject(neighborTile);
+            var otherList = GetAllowedForDirection(serializedNeighbor, direction.GetOpposite());
+            RemoveTileFromList(otherList, (Tile) target);
+            serializedNeighbor.ApplyModifiedProperties();
+            AssetDatabase.SaveAssetIfDirty(serializedNeighbor.targetObject);
         }
     }
 
@@ -369,11 +372,17 @@ public class Tile_Inspector : Editor
         }
         else
         {
-            var otherList = GetAllowedForDirection(neighborTile, direction.GetOpposite());
-            if (!otherList.Contains((Tile) target))
+            var serializedNeighbor = new SerializedObject(neighborTile);
+            var otherList = GetAllowedForDirection(serializedNeighbor, direction.GetOpposite());
+            if (!IsTileInList(otherList, (Tile) target))
             {
-                otherList.Add((Tile) target);
+                otherList.InsertArrayElementAtIndex(otherList.arraySize);
+                SerializedProperty element = otherList.GetArrayElementAtIndex(otherList.arraySize - 1);
+                element.objectReferenceValue = target;
             }
+
+            serializedNeighbor.ApplyModifiedProperties();
+            AssetDatabase.SaveAssetIfDirty(serializedNeighbor.targetObject);
         }
     }
 
@@ -391,16 +400,16 @@ public class Tile_Inspector : Editor
         };
     }
 
-    private List<Tile> GetAllowedForDirection(Tile tile, Direction direction)
+    private SerializedProperty GetAllowedForDirection(SerializedObject tile, Direction direction)
     {
         return direction switch
         {
-            Direction.ABOVE => tile.allowedAboveList,
-            Direction.BELOW => tile.allowedBelowList,
-            Direction.NORTH => tile.allowedNorthList,
-            Direction.EAST => tile.allowedEastList,
-            Direction.SOUTH => tile.allowedSouthList,
-            Direction.WEST => tile.allowedWestList,
+            Direction.ABOVE => tile.FindProperty("allowedAboveList"),
+            Direction.BELOW => tile.FindProperty("allowedBelowList"),
+            Direction.NORTH => tile.FindProperty("allowedNorthList"),
+            Direction.EAST => tile.FindProperty("allowedEastList"),
+            Direction.SOUTH => tile.FindProperty("allowedSouthList"),
+            Direction.WEST => tile.FindProperty("allowedWestList"),
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
