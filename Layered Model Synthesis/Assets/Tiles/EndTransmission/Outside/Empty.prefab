@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6329739202184370638
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5904452077181471530}
+  - component: {fileID: -8787103947839802906}
+  m_Layer: 0
+  m_Name: Empty
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5904452077181471530
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6329739202184370638}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-8787103947839802906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6329739202184370638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b03688d4a1164075a78202a1f0414fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileset: {fileID: 11400000, guid: 3876f8e56320f1840a0a2f88605a7845, type: 2}
+  allowedAboveList:
+  - {fileID: -8787103947839802906, guid: 704c474fcd2c6b543b4d3f25635955f7, type: 3}
+  - {fileID: -8787103947839802906}
+  allowedBelowList:
+  - {fileID: -8787103947839802906, guid: 704c474fcd2c6b543b4d3f25635955f7, type: 3}
+  - {fileID: -8787103947839802906}
+  - {fileID: -3714930282893648593, guid: 7bd947dbe7d0ceb48ae29adea5c52af6, type: 3}
+  - {fileID: -5748341076167981250, guid: 3f5213b85d31479488b945ae810797ca, type: 3}
+  - {fileID: 297972329434130932, guid: 86021a9e13bfe4b45bbb18754a787ead, type: 3}
+  - {fileID: -1049542303849968886, guid: 054395dfb08997545b5e00c7a86aa350, type: 3}
+  - {fileID: 7573178735620103158, guid: acf09c1e58296a840a58db9e2c356838, type: 3}
+  - {fileID: 1751522494426059091, guid: c1dc0d9a881984843831fb216e426f20, type: 3}
+  - {fileID: -229963478126299036, guid: f83fcd4c1a663804c9634702c6b59098, type: 3}
+  - {fileID: -8316014546878709151, guid: 09d808200716d0b4ead3f920884eb7d8, type: 3}
+  - {fileID: 2421575256113344991, guid: 9459dd68e87e69341a5a058d1fcb2b88, type: 3}
+  allowedNorthList:
+  - {fileID: -8787103947839802906, guid: 704c474fcd2c6b543b4d3f25635955f7, type: 3}
+  - {fileID: -8787103947839802906}
+  - {fileID: -3714930282893648593, guid: 7bd947dbe7d0ceb48ae29adea5c52af6, type: 3}
+  - {fileID: -8316014546878709151, guid: 09d808200716d0b4ead3f920884eb7d8, type: 3}
+  - {fileID: -5748341076167981250, guid: 3f5213b85d31479488b945ae810797ca, type: 3}
+  - {fileID: 297972329434130932, guid: 86021a9e13bfe4b45bbb18754a787ead, type: 3}
+  - {fileID: -1049542303849968886, guid: 054395dfb08997545b5e00c7a86aa350, type: 3}
+  - {fileID: 7573178735620103158, guid: acf09c1e58296a840a58db9e2c356838, type: 3}
+  - {fileID: 1751522494426059091, guid: c1dc0d9a881984843831fb216e426f20, type: 3}
+  - {fileID: -229963478126299036, guid: f83fcd4c1a663804c9634702c6b59098, type: 3}
+  - {fileID: 2421575256113344991, guid: 9459dd68e87e69341a5a058d1fcb2b88, type: 3}
+  allowedEastList:
+  - {fileID: -8787103947839802906, guid: 704c474fcd2c6b543b4d3f25635955f7, type: 3}
+  - {fileID: -8787103947839802906}
+  - {fileID: -3714930282893648593, guid: 7bd947dbe7d0ceb48ae29adea5c52af6, type: 3}
+  - {fileID: -8316014546878709151, guid: 09d808200716d0b4ead3f920884eb7d8, type: 3}
+  - {fileID: -5748341076167981250, guid: 3f5213b85d31479488b945ae810797ca, type: 3}
+  - {fileID: 297972329434130932, guid: 86021a9e13bfe4b45bbb18754a787ead, type: 3}
+  - {fileID: -1049542303849968886, guid: 054395dfb08997545b5e00c7a86aa350, type: 3}
+  - {fileID: 7573178735620103158, guid: acf09c1e58296a840a58db9e2c356838, type: 3}
+  - {fileID: 1751522494426059091, guid: c1dc0d9a881984843831fb216e426f20, type: 3}
+  - {fileID: -229963478126299036, guid: f83fcd4c1a663804c9634702c6b59098, type: 3}
+  - {fileID: 2421575256113344991, guid: 9459dd68e87e69341a5a058d1fcb2b88, type: 3}
+  allowedSouthList:
+  - {fileID: -8787103947839802906, guid: 704c474fcd2c6b543b4d3f25635955f7, type: 3}
+  - {fileID: -8787103947839802906}
+  - {fileID: -8316014546878709151, guid: 09d808200716d0b4ead3f920884eb7d8, type: 3}
+  - {fileID: -5748341076167981250, guid: 3f5213b85d31479488b945ae810797ca, type: 3}
+  - {fileID: 297972329434130932, guid: 86021a9e13bfe4b45bbb18754a787ead, type: 3}
+  - {fileID: -1049542303849968886, guid: 054395dfb08997545b5e00c7a86aa350, type: 3}
+  - {fileID: 7573178735620103158, guid: acf09c1e58296a840a58db9e2c356838, type: 3}
+  - {fileID: 1751522494426059091, guid: c1dc0d9a881984843831fb216e426f20, type: 3}
+  - {fileID: -229963478126299036, guid: f83fcd4c1a663804c9634702c6b59098, type: 3}
+  - {fileID: -3714930282893648593, guid: 7bd947dbe7d0ceb48ae29adea5c52af6, type: 3}
+  - {fileID: 2421575256113344991, guid: 9459dd68e87e69341a5a058d1fcb2b88, type: 3}
+  allowedWestList:
+  - {fileID: -8787103947839802906, guid: 704c474fcd2c6b543b4d3f25635955f7, type: 3}
+  - {fileID: -8787103947839802906}
+  - {fileID: -3714930282893648593, guid: 7bd947dbe7d0ceb48ae29adea5c52af6, type: 3}
+  - {fileID: -8316014546878709151, guid: 09d808200716d0b4ead3f920884eb7d8, type: 3}
+  - {fileID: -5748341076167981250, guid: 3f5213b85d31479488b945ae810797ca, type: 3}
+  - {fileID: 297972329434130932, guid: 86021a9e13bfe4b45bbb18754a787ead, type: 3}
+  - {fileID: -1049542303849968886, guid: 054395dfb08997545b5e00c7a86aa350, type: 3}
+  - {fileID: 7573178735620103158, guid: acf09c1e58296a840a58db9e2c356838, type: 3}
+  - {fileID: 1751522494426059091, guid: c1dc0d9a881984843831fb216e426f20, type: 3}
+  - {fileID: -229963478126299036, guid: f83fcd4c1a663804c9634702c6b59098, type: 3}
+  - {fileID: 2421575256113344991, guid: 9459dd68e87e69341a5a058d1fcb2b88, type: 3}
+  allowRotation: 0
+  sameRotationWhenStacked: 0
+  allowFreeRotation: 0
+  dontInstantiate: 0
+  weight: 0.605
+  customSize: {x: 1, y: 1, z: 1}
