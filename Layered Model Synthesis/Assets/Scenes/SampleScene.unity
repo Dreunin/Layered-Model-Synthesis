@@ -983,10 +983,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f1a51da56c1ec47b213a26b4dd1b6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileset: {fileID: 11400000, guid: b20693b64b30d2b49b8e6cd70f81c1ab, type: 2}
+  tileset: {fileID: 11400000, guid: d126674915d540b4a9265033367eb096, type: 2}
   width: 10
   length: 10
-  height: 5
+  height: 1
   animate: 0
   timeToAnimate: 10
   poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
