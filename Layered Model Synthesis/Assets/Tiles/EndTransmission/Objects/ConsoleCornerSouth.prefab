@@ -47,9 +47,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileset: {fileID: 11400000, guid: d126674915d540b4a9265033367eb096, type: 2}
   allowedAboveList:
-  - {fileID: -9185049944240717472, guid: 6f8b68e8959b4664fb6adbfa43415d19, type: 3}
-  - {fileID: -8787103947839802906, guid: 867ba5d8e03a9a547afab4fbb4a67ef1, type: 3}
   - {fileID: 4291747830163367848, guid: 22cb23cc90c3196499e5fc0dfa8bf6a8, type: 3}
+  - {fileID: -8787103947839802906, guid: 867ba5d8e03a9a547afab4fbb4a67ef1, type: 3}
+  - {fileID: -9185049944240717472, guid: 6f8b68e8959b4664fb6adbfa43415d19, type: 3}
   allowedBelowList:
   - {fileID: -9185049944240717472, guid: 6f8b68e8959b4664fb6adbfa43415d19, type: 3}
   allowedNorthList:

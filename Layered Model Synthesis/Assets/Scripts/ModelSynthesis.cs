@@ -94,6 +94,8 @@ public class ModelSynthesis : MonoBehaviour
     {
         parentTransform = new GameObject("Room").transform;
         
+        MassPropagate();
+        
         for (int y = 0; y < height; y++)
         {
             Transform layerTransform = new GameObject($"Layer{y}").transform;
@@ -113,13 +115,30 @@ public class ModelSynthesis : MonoBehaviour
                         continue;
                     }
                     
-                    Propagate(x, y, z);
                     Possibility newTile = Observe(x, y, z);
+                    Propagate(x, y, z);
                     PlaceTile(x, y, z, newTile,layerTransform);
                 }
             }
         }
         if(animate) StartCoroutine(nameof(AnimatePlaceTiles));
+    }
+    
+    /// <summary>
+    /// Initial propagation over the entire grid
+    /// </summary>
+    private void MassPropagate()
+    {
+        for(int x = 0; x < width; x++)
+        {
+            for(int y = 0; y < height; y++)
+            {
+                for(int z = 0; z < length; z++)
+                {
+                    Propagate(x, y, z, true);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -179,12 +198,28 @@ public class ModelSynthesis : MonoBehaviour
         throw new Exception("Failed to pick a possibility");
     }
 
-    private void Propagate(int x, int y, int z)
+    private void Propagate(int x, int y, int z, bool propagateFromSelf = false)
     {
         if (!InGrid(x, y, z)) return;
         
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>();
-        q.Push((x, y, z)); // Start with the initial tile
+        if (!propagateFromSelf)
+        {
+            foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
+            {
+                (int dx, int dy, int dz) = d.ToOffset();
+                int nx = x + dx;
+                int ny = y + dy;
+                int nz = z + dz;
+
+                if (!InGrid(nx, ny, nz)) continue;
+                q.Push((nx, ny, nz));
+            }
+        }
+        else
+        {
+            q.Push((x, y, z)); // Start with the initial tile
+        }
 
         int originalX = x;
         int originalY = y;
