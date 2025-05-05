@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -118,7 +119,14 @@ public class ModelSynthesis : MonoBehaviour
                     }
                     
                     Possibility newTile = Observe(x, y, z);
-                    Propagate(x, y, z);
+                    if (newTile.tile.IsCustomSize)
+                    {
+                        PropagateMultitile(x, y, z, newTile);
+                    }
+                    else
+                    {
+                        Propagate(x, y, z);
+                    }
                     PlaceTile(x, y, z, newTile,layerTransform);
                 }
             }
@@ -200,11 +208,93 @@ public class ModelSynthesis : MonoBehaviour
         throw new Exception("Failed to pick a possibility");
     }
 
+    private void PropagateMultitile(int x, int y, int z, Possibility multiTile)
+    {
+        var initialTiles = new List<(int x, int y, int z)>();
+        // Above
+        {
+            int j = y + multiTile.tile.customSize.y;
+            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            {
+                for (int k = z - 1; k < z + multiTile.tile.customSize.z; k++)
+                {
+                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
+                    initialTiles.Add((i, j, k));
+                }
+            }
+        }
+        
+        // Below
+        {
+            int j = y - 1;
+            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            {
+                for (int k = z - 1; k < z + multiTile.tile.customSize.z; k++)
+                {
+                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
+                    initialTiles.Add((i, j, k));
+                }
+            }
+        }
+        
+        // North
+        {
+            int k = z + multiTile.tile.customSize.z;
+            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            {
+                for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+                {
+                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
+                    initialTiles.Add((i, j, k));
+                }
+            }
+        }
+        
+        // South
+        {
+            int k = z - 1;
+            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            {
+                for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+                {
+                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
+                    initialTiles.Add((i, j, k));
+                }
+            }
+        }
+        
+        // East
+        {
+            int i = x + multiTile.tile.customSize.x;
+            for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+            {
+                for (int k = z; k < z + multiTile.tile.customSize.z - 1; k++)
+                {
+                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
+                    initialTiles.Add((i, j, k));
+                }
+            }
+        }
+        
+        // West
+        {
+            int i = x - 1;
+            for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+            {
+                for (int k = z; k < z + multiTile.tile.customSize.z - 1; k++)
+                {
+                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
+                    initialTiles.Add((i, j, k));
+                }
+            }
+        }
+        
+        Propagate(x, y, z, initialTiles);
+    }
+
     private void Propagate(int x, int y, int z, bool propagateFromSelf = false)
     {
-        if (!InGrid(x, y, z)) return;
-        
-        Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>();
+        var initialTiles = new List<(int x, int y, int z)>();
         if (!propagateFromSelf)
         {
             foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
@@ -215,13 +305,21 @@ public class ModelSynthesis : MonoBehaviour
                 int nz = z + dz;
 
                 if (!InGrid(nx, ny, nz) || possibilities[nx, ny, nz].First().placed) continue;
-                q.Push((nx, ny, nz));
+                initialTiles.Add((nx, ny, nz));
             }
         }
         else
         {
-            q.Push((x, y, z)); // Start with the initial tile
+            initialTiles.Add((x, y, z)); // Start with the initial tile
         }
+        Propagate(x, y, z, initialTiles);
+    }
+    
+    private void Propagate(int x, int y, int z, List<(int x, int y, int z)> initialTiles)
+    {
+        if (!InGrid(x, y, z)) return;
+        
+        Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>(initialTiles);
 
         int originalX = x;
         int originalY = y;
