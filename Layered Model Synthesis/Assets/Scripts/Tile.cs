@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+/// <summary>
+/// A tile is any object that can be placed in the grid.
+/// Attached to a prefab and dictates the rules of placement.
+/// A tile is part of a tileset and references other tiles in that tileset.
+/// </summary>
 public class Tile : MonoBehaviour
 {
     [SerializeField] public Tileset tileset;
@@ -64,6 +68,18 @@ public class Tile : MonoBehaviour
             2 => allowedSouth,
             3 => allowedWest,
             _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
+        };
+    }
+    
+    public Vector3Int GetRotatedSize(Rotation rot = Rotation.zero)
+    {
+        return rot switch
+        {
+            Rotation.zero => customSize,
+            Rotation.ninety => new Vector3Int(customSize.z, customSize.y, customSize.x),
+            Rotation.oneEighty => new Vector3Int(customSize.x, customSize.y, customSize.z),
+            Rotation.twoSeventy => new Vector3Int(customSize.z, customSize.y, customSize.x),
+            _ => throw new ArgumentOutOfRangeException(nameof(rot), rot, null)
         };
     }
 }

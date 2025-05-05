@@ -1,5 +1,7 @@
 ﻿using System;
-
+/// <summary>
+/// Extention of the Direction enum. Used to get offsets accounting for rotation or to get the opposite direction.
+/// </summary>
 public static class DirectionExtensions
 {
     public static (int, int, int) ToOffset(this Direction dir)

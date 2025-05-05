@@ -75,18 +75,19 @@ public class ModelSynthesis : MonoBehaviour
         if (animate && Application.isEditor && !Application.isPlaying)
         {
             animate = false;
-            Debug.LogError("animate changed to FALSE; you are in editor mode.");
+            Debug.LogError("\"animate\" changed to FALSE; you are in editor mode.");
         }
         
         if(width <= 0 || height <= 0 || length <= 0)
         {
-            Debug.LogError("Width, height and length must be greater than 0");
+            Debug.LogError("width, height and length must be greater than 0");
             return;
         }
         
         InitializePossibilities();
 
         Random.InitState(seed);
+        parentTransform = new GameObject($"Room {seed}").transform;
         Synthesise();
     }
 
@@ -95,8 +96,6 @@ public class ModelSynthesis : MonoBehaviour
     /// </summary>
     private void Synthesise()
     {
-        parentTransform = new GameObject("Room").transform;
-        
         MassPropagate();
         
         for (int y = 0; y < height; y++)
@@ -132,6 +131,7 @@ public class ModelSynthesis : MonoBehaviour
             }
         }
         if(animate) StartCoroutine(nameof(AnimatePlaceTiles));
+        Debug.Log("Model Synthesis complete.");
     }
     
     /// <summary>
@@ -164,11 +164,12 @@ public class ModelSynthesis : MonoBehaviour
         Possibility observed = PossibilityBasedOnWeight(x, y, z);
         if (observed.tile.IsCustomSize) //If multitile, we need to observe the other grid point the tile fills
         {
-            for (int i = 0; i < observed.tile.customSize.x; i++)
+            Vector3Int vector = observed.tile.GetRotatedSize(observed.rotation);
+            for (int i = 0; i < vector.x; i++)
             {
-                for (int j = 0; j < observed.tile.customSize.y; j++)
+                for (int j = 0; j < vector.y; j++)
                 {
-                    for (int k = 0; k < observed.tile.customSize.z; k++)
+                    for (int k = 0; k < vector.z; k++)
                     {
                         var p = new Possibility(observed.tile, observed.rotation)
                         {
@@ -190,6 +191,16 @@ public class ModelSynthesis : MonoBehaviour
         return observed;
     }
 
+    /// <summary>
+    /// Randomly selects a possibility based on the weight of the available tiles at the given coordinates.
+    /// Used to select a tile to place in the grid.
+    /// The weight is used to determine the probability of selecting a tile. The higher the weight, the more likely it is to be selected.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     private Possibility PossibilityBasedOnWeight(int x, int y, int z)
     {
         var pos = possibilities[x, y, z].ToArray().Where(p => p.root).ToArray();
@@ -208,15 +219,23 @@ public class ModelSynthesis : MonoBehaviour
         throw new Exception("Failed to pick a possibility");
     }
 
+    /// <summary>
+    /// Propagates around multi-tile tiles. Ensures proper updates to the grid after multi-tile placement. 
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <param name="multiTile"></param>
     private void PropagateMultitile(int x, int y, int z, Possibility multiTile)
     {
+        Vector3Int size = multiTile.tile.GetRotatedSize(multiTile.rotation);
         var initialTiles = new List<(int x, int y, int z)>();
         // Above
         {
-            int j = y + multiTile.tile.customSize.y;
-            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            int j = y + size.y;
+            for (int i = x; i < x + size.x; i++)
             {
-                for (int k = z - 1; k < z + multiTile.tile.customSize.z; k++)
+                for (int k = z; k < z + size.z; k++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -227,9 +246,9 @@ public class ModelSynthesis : MonoBehaviour
         // Below
         {
             int j = y - 1;
-            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            for (int i = x; i < x + size.x; i++)
             {
-                for (int k = z - 1; k < z + multiTile.tile.customSize.z; k++)
+                for (int k = z; k < z + size.z; k++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -239,10 +258,10 @@ public class ModelSynthesis : MonoBehaviour
         
         // North
         {
-            int k = z + multiTile.tile.customSize.z;
-            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            int k = z + size.z;
+            for (int i = x; i < x + size.x; i++)
             {
-                for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+                for (int j = z; j < y + size.y; j++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -253,9 +272,9 @@ public class ModelSynthesis : MonoBehaviour
         // South
         {
             int k = z - 1;
-            for (int i = x - 1; i < x + multiTile.tile.customSize.x; i++)
+            for (int i = x; i < x + size.x; i++)
             {
-                for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+                for (int j = z; j < y + size.y; j++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -265,10 +284,10 @@ public class ModelSynthesis : MonoBehaviour
         
         // East
         {
-            int i = x + multiTile.tile.customSize.x;
-            for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+            int i = x + size.x;
+            for (int j = z; j < y + size.y; j++)
             {
-                for (int k = z; k < z + multiTile.tile.customSize.z - 1; k++)
+                for (int k = z; k < z + size.z; k++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -279,9 +298,9 @@ public class ModelSynthesis : MonoBehaviour
         // West
         {
             int i = x - 1;
-            for (int j = z; j < y + multiTile.tile.customSize.y - 1; j++)
+            for (int j = z; j < y + size.y; j++)
             {
-                for (int k = z; k < z + multiTile.tile.customSize.z - 1; k++)
+                for (int k = z; k < z + size.z; k++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -292,6 +311,13 @@ public class ModelSynthesis : MonoBehaviour
         Propagate(x, y, z, initialTiles);
     }
 
+    /// <summary>
+    /// Overloaded version of Propagate that determines which initial tiles to propagate from based on the propgateFromSelf parameter.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <param name="propagateFromSelf">If false: propagate from each neighbour tile - if true: propagate from (x, y, z)</param>
     private void Propagate(int x, int y, int z, bool propagateFromSelf = false)
     {
         var initialTiles = new List<(int x, int y, int z)>();
@@ -315,6 +341,14 @@ public class ModelSynthesis : MonoBehaviour
         Propagate(x, y, z, initialTiles);
     }
     
+    /// <summary>
+    /// Core propagate method
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <param name="initialTiles">The initial tiles to start propagating from.</param>
+    /// <exception cref="Exception">if there are no possibilities left. Either due to a bug in code or an error in the tileset.</exception>
     private void Propagate(int x, int y, int z, List<(int x, int y, int z)> initialTiles)
     {
         if (!InGrid(x, y, z)) return;
@@ -378,13 +412,13 @@ public class ModelSynthesis : MonoBehaviour
                     }
                     HashSet<Possibility> allowedByNeighbourPossibilities = PossibilitiesFromTiles(allowedByNeighbour);
                     
-                    if(d == Direction.BELOW && possibilities[nx,ny,nz].ElementAt(0).tile.sameRotationWhenStacked) //Enforce above tiles follow below rotation. Tiles below have always already been placed.
+                    if(d == Direction.BELOW && possibilities[nx,ny,nz].First().placed && possibilities[nx,ny,nz].First().tile.sameRotationWhenStacked) //Enforce above tiles follow below rotation. Tiles below have always already been placed.
                     {
                         //We remove any possibility that doesn't have the same rotation as the tile below
                         for (int i = allowedByNeighbourPossibilities.Count - 1; i >= 0; i--)
                         {
                             Possibility p = allowedByNeighbourPossibilities.ElementAt(i);
-                            if (p.tile.allowRotation && possibilities[nx, ny, nz].ElementAt(0).rotation != p.rotation)
+                            if (p.tile.allowRotation && possibilities[nx, ny, nz].First().rotation != p.rotation)
                             {
                                 allowedByNeighbourPossibilities.Remove(p);
                             }
@@ -400,36 +434,42 @@ public class ModelSynthesis : MonoBehaviour
             foreach (Possibility p in possibilities[x, y, z])
             {
                 if (!p.tile.IsCustomSize) continue;
+                Vector3Int size = p.tile.GetRotatedSize(p.rotation);
                 
-                bool failed = false;
-                for (int i = 0; i < p.tile.customSize.x; i++)
+                if (p.root)
                 {
-                    for (int j = 0; j < p.tile.customSize.y; j++)
+                    bool failed = false;
+                    for (int i = 0; i < size.x; i++)
                     {
-                        for (int k = 0; k < p.tile.customSize.z; k++)
+                        for (int j = 0; j < size.y; j++)
                         {
-                            //If in grid and possibilities contains same tile as non-root
-                            if(!InGrid(x+i, y+j, z+k) || !possibilities[x+i,y+j,z+k].Contains(p) ||
-                               (possibilities[x + i, y + j, z + k].Count == 1 && possibilities[x+i,y+j,z+k].First().placed))
+                            for (int k = 0; k < size.z; k++)
                             {
-                                p.root = false;
-                                failed = true;
-                                break;
+                                //If in grid and possibilities contains same tile as non-root
+                                if(!InGrid(x+i, y+j, z+k) || !possibilities[x+i,y+j,z+k].Contains(p) ||
+                                   (possibilities[x + i, y + j, z + k].Count == 1 && possibilities[x+i,y+j,z+k].First().placed))
+                                {
+                                    p.root = false;
+                                    failed = true;
+                                    break;
+                                }
                             }
+                            if (failed) break;
                         }
                         if (failed) break;
                     }
-                    if (failed) break;
+                    
+                    p.root = CanMultiTileBePlaced(x, y, z, p);
                 }
 
                 if (!p.root)
                 {
                     bool foundRoot = false;
-                    for (int i = 0; i < p.tile.customSize.x; i++)
+                    for (int i = 0; i < size.x; i++)
                     {
-                        for (int j = 0; j < p.tile.customSize.y; j++)
+                        for (int j = 0; j < size.y; j++)
                         {
-                            for (int k = 0; k < p.tile.customSize.z; k++)
+                            for (int k = 0; k < size.z; k++)
                             {
                                 if (InGrid(x-i,y-j,z-k) && possibilities[x - i, y - j, z - k].Any(p2 => p2.Equals(p) && p2.root))
                                 {
@@ -452,7 +492,7 @@ public class ModelSynthesis : MonoBehaviour
             
             if (possibilities[x, y, z].Count == 0)
             {
-                throw new Exception($"No possibilities left at ({x}, {y}, {z}). Originally propagating from ({originalX}, {originalY}, {originalZ}).");
+                throw new Exception($"No possibilities left at ({x}, {y}, {z}). Originally propagating from ({originalX}, {originalY}, {originalZ}). Tried to place {possibilities[originalX, originalY, originalZ].First().tile.name}.");
             }
             
             // Check if any possibilities have been removed - if so propagate on neighbours
@@ -471,6 +511,126 @@ public class ModelSynthesis : MonoBehaviour
                 }
             }
         }
+    }
+    
+    /// <summary>
+    /// Checks if a multi-tile can be placed at the given coordinates.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <param name="multiTile"></param>
+    /// <returns></returns>
+    private bool CanMultiTileBePlaced(int x, int y, int z, Possibility multiTile)
+    {
+        bool CheckDirection(int i, int j, int k, Direction d)
+        {
+            if (!InGrid(i, j, k)) //Handle border
+            {
+                if (!multiTile.tile.GetAllowed(d, multiTile.rotation).Contains(border))
+                {
+                    return false;
+                }
+            }
+            else // Normal tile
+            {
+                if (!multiTile.tile.GetAllowed(d, multiTile.rotation)
+                        .Any(t => possibilities[i, j, k].Select(p => p.tile).Contains(t)))
+                {
+                    return false;
+                }
+
+                if (!possibilities[i, j, k].Any(p =>
+                        p.tile.GetAllowed(d.GetOpposite(), p.rotation).Contains(multiTile.tile)))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
+        Vector3Int size = multiTile.tile.GetRotatedSize(multiTile.rotation);
+        // Above
+        {
+            int j = y + size.y;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    if (!CheckDirection(i, j, k, Direction.ABOVE)) return false;
+                }
+            }
+        }
+        
+        // Below
+        {
+            int j = y - 1;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    if (!CheckDirection(i, j, k, Direction.BELOW)) return false;
+
+                    if (!InGrid(i, j, k)) continue;
+                    Possibility below = possibilities[i, j, k].First();
+                    if (below.placed && below.tile.sameRotationWhenStacked && below.rotation != multiTile.rotation)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        // North
+        {
+            int k = z + size.z;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int j = z; j < y + size.y; j++)
+                {
+                    if (!CheckDirection(i, j, k, Direction.NORTH)) return false;
+                }
+            }
+        }
+        
+        // South
+        {
+            int k = z - 1;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int j = z; j < y + size.y; j++)
+                {
+                    if (!CheckDirection(i, j, k, Direction.SOUTH)) return false;
+                }
+            }
+        }
+        
+        // East
+        {
+            int i = x + size.x;
+            for (int j = z; j < y + size.y; j++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    if (!CheckDirection(i, j, k, Direction.EAST)) return false;
+                }
+            }
+        }
+        
+        // West
+        {
+            int i = x - 1;
+            for (int j = z; j < y + size.y; j++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    if (!CheckDirection(i, j, k, Direction.WEST)) return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private HashSet<Possibility> PossibilitiesFromTiles(HashSet<Tile> tiles)
@@ -521,13 +681,17 @@ public class ModelSynthesis : MonoBehaviour
     private void PlaceTile(int x, int y, int z, Possibility possibility, Transform parent)
     {
         if(possibility.tile.dontInstantiate) return; //If the tile is not supposed to be instantiated, we don't
-        Vector3 placement = new Vector3(x, y, z) + new Vector3(possibility.tile.customSize.x-1,0, possibility.tile.customSize.z-1) / 2f;
+        Vector3 placement = new Vector3(x, y, z) + new Vector3(possibility.tile.GetRotatedSize(possibility.rotation).x-1,0, possibility.tile.GetRotatedSize(possibility.rotation).z-1) / 2f;
         Tile newTile = Instantiate(possibility.tile, placement, possibility.GetRotation());
         newTile.transform.SetParent(parent);
         if(possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
         if(animate) newTile.gameObject.SetActive(false);
     }
     
+    /// <summary>
+    /// Simple animation of tile placement accompanied by VFX. 
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator AnimatePlaceTiles()
     {
         float timePerChild = timeToAnimate / (height*length*width);
