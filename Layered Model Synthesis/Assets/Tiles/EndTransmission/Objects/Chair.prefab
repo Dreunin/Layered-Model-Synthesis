@@ -325,4 +325,4 @@ MonoBehaviour:
   allowFreeRotation: 1
   dontInstantiate: 0
   weight: 0.5
-  customSize: {x: 1, y: 1, z: 1}
+  customSize: {x: 1, y: 2, z: 1}

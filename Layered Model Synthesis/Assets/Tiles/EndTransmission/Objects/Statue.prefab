@@ -105,7 +105,8 @@ MonoBehaviour:
   - {fileID: -8787103947839802906, guid: 867ba5d8e03a9a547afab4fbb4a67ef1, type: 3}
   - {fileID: 4291747830163367848, guid: 22cb23cc90c3196499e5fc0dfa8bf6a8, type: 3}
   allowedBelowList:
-  - {fileID: -9185049944240717472, guid: 6f8b68e8959b4664fb6adbfa43415d19, type: 3}
+  - {fileID: -7293958282713000360, guid: e0239dcfcb6a5df4db548482ef3daf8f, type: 3}
+  - {fileID: 830709958335105142, guid: 0bb81fce499458d4a84e8c03da507e57, type: 3}
   allowedNorthList:
   - {fileID: 4065966629722668624, guid: 355a47b739df7f84199ae1b699ac1e25, type: 3}
   - {fileID: -7293958282713000360, guid: e0239dcfcb6a5df4db548482ef3daf8f, type: 3}

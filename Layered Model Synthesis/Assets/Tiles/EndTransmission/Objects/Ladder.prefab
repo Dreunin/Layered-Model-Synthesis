@@ -127,7 +127,7 @@ MonoBehaviour:
   allowFreeRotation: 0
   dontInstantiate: 0
   weight: 0.5
-  customSize: {x: 1, y: 1, z: 1}
+  customSize: {x: 1, y: 3, z: 1}
 --- !u!1 &2717531279243627537
 GameObject:
   m_ObjectHideFlags: 0

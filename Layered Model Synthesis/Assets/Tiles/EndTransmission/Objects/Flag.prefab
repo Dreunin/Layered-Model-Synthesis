@@ -151,7 +151,7 @@ MonoBehaviour:
   allowFreeRotation: 0
   dontInstantiate: 0
   weight: 0.1
-  customSize: {x: 1, y: 1, z: 1}
+  customSize: {x: 1, y: 2, z: 3}
 --- !u!1001 &5602376715496034442
 PrefabInstance:
   m_ObjectHideFlags: 0
