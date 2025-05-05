@@ -225,7 +225,6 @@ MonoBehaviour:
   - {fileID: 6104773790594339738}
   - {fileID: -6276556406107551574, guid: 21e6a26e04a65d14da02384034c38a34, type: 3}
   - {fileID: 6640412011240929303, guid: 1a2ce40d183655243aff8990522cf526, type: 3}
-  - {fileID: 4550495449048630148, guid: d7693c47f1986ed47bcde9d824b097ae, type: 3}
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
   allowedBelowList:
@@ -283,6 +282,7 @@ MonoBehaviour:
   allowFreeRotation: 0
   dontInstantiate: 0
   weight: 0.2
+  customSize: {x: 1, y: 1, z: 1}
 --- !u!1 &6770889022945221699
 GameObject:
   m_ObjectHideFlags: 0

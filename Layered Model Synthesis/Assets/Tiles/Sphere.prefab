@@ -125,18 +125,7 @@ MonoBehaviour:
   allowedAboveList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: 262106390879836795, guid: fe86f4ff96bc08d4195da64d7c0c7552, type: 3}
-  allowedBelowList:
-  - {fileID: -4270331480369499827, guid: f6d15c9c984b4b64a9dedaa8cdb3ed29, type: 3}
-  - {fileID: 488962987599512184, guid: cf664e04fa7da4f4d91451f257ad4b9a, type: 3}
-  - {fileID: 5794254982964291686, guid: 7714ecf85084cfc45ab0b6a7d2e0d0fe, type: 3}
-  - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
-  - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
-  - {fileID: 6638298772880334903, guid: 802b72c0f2504644284f64cd364322dd, type: 3}
-  - {fileID: 262106390879836795, guid: d8f058339c090d94e95a6c8c72a95959, type: 3}
-  - {fileID: 4550495449048630148}
-  - {fileID: 2094558542846813651, guid: d67f8c2e503aee44facfab733c6f7937, type: 3}
-  - {fileID: 6104773790594339738, guid: c9a659eebca92af409373375e8194edb, type: 3}
-  - {fileID: -6276556406107551574, guid: 21e6a26e04a65d14da02384034c38a34, type: 3}
+  allowedBelowList: []
   allowedNorthList:
   - {fileID: 262106390879836795, guid: 45d019746294142469fd26c7518e7110, type: 3}
   - {fileID: -7275378623634293086, guid: a17db95be1db18b4a92cdd09994dfefe, type: 3}
@@ -190,3 +179,4 @@ MonoBehaviour:
   allowFreeRotation: 1
   dontInstantiate: 0
   weight: 0.05
+  customSize: {x: 1, y: 1, z: 1}
