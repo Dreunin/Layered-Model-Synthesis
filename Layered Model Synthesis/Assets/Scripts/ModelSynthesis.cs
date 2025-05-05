@@ -230,10 +230,6 @@ public class ModelSynthesis : MonoBehaviour
         while (q.Count > 0)
         {
             (x, y, z) = q.Pop();
-            if (possibilities[x, y, z].Count == 0)
-            {
-                throw new Exception($"No possibilities left at ({x}, {y}, {z}). Originally propagating from ({originalX}, {originalY}, {originalZ}).");
-            }
 
             int countBefore = possibilities[x, y, z].Count; //Used to check if we need to propagate again
 
@@ -302,6 +298,7 @@ public class ModelSynthesis : MonoBehaviour
             }
             
             //Multi-tile tiles
+            HashSet<Possibility> toRemove = new HashSet<Possibility>();
             foreach (Possibility p in possibilities[x, y, z])
             {
                 if (!p.tile.IsCustomSize) continue;
@@ -326,6 +323,38 @@ public class ModelSynthesis : MonoBehaviour
                     }
                     if (failed) break;
                 }
+
+                if (!p.root)
+                {
+                    bool foundRoot = false;
+                    for (int i = 0; i < p.tile.customSize.x; i++)
+                    {
+                        for (int j = 0; j < p.tile.customSize.y; j++)
+                        {
+                            for (int k = 0; k < p.tile.customSize.z; k++)
+                            {
+                                if (InGrid(x-i,y-j,z-k) && possibilities[x - i, y - j, z - k].Any(p2 => p2.Equals(p) && p2.root))
+                                {
+                                    foundRoot = true;
+                                    break;
+                                }
+                            }
+                            if (foundRoot) break;
+                        }
+                        if (foundRoot) break;
+                    }
+
+                    if (!foundRoot)
+                    {
+                        toRemove.Add(p);
+                    }
+                }
+            }
+            possibilities[x, y, z].ExceptWith(toRemove);
+            
+            if (possibilities[x, y, z].Count == 0)
+            {
+                throw new Exception($"No possibilities left at ({x}, {y}, {z}). Originally propagating from ({originalX}, {originalY}, {originalZ}).");
             }
             
             // Check if any possibilities have been removed - if so propagate on neighbours
