@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Tile : MonoBehaviour
@@ -30,21 +31,13 @@ public class Tile : MonoBehaviour
 
     private void OnValidate()
     {
-        // Remove missing elements from lists
-        allowedAboveList.RemoveAll(t => t == null);
-        allowedBelowList.RemoveAll(t => t == null);
-        allowedNorthList.RemoveAll(t => t == null);
-        allowedEastList.RemoveAll(t => t == null);
-        allowedSouthList.RemoveAll(t => t == null);
-        allowedWestList.RemoveAll(t => t == null);
-        
         // Update hashsets
-        allowedAbove = new HashSet<Tile>(allowedAboveList);
-        allowedBelow = new HashSet<Tile>(allowedBelowList);
-        allowedNorth = new HashSet<Tile>(allowedNorthList);
-        allowedEast  = new HashSet<Tile>(allowedEastList);
-        allowedSouth = new HashSet<Tile>(allowedSouthList);
-        allowedWest  = new HashSet<Tile>(allowedWestList);
+        allowedAbove = new HashSet<Tile>(allowedAboveList.Where(t => t != null));
+        allowedBelow = new HashSet<Tile>(allowedBelowList.Where(t => t != null));
+        allowedNorth = new HashSet<Tile>(allowedNorthList.Where(t => t != null));
+        allowedEast  = new HashSet<Tile>(allowedEastList.Where(t => t != null));
+        allowedSouth = new HashSet<Tile>(allowedSouthList.Where(t => t != null));
+        allowedWest  = new HashSet<Tile>(allowedWestList.Where(t => t != null));
         
         if(allowFreeRotation && allowRotation)
         {
