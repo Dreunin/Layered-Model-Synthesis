@@ -261,7 +261,7 @@ public class ModelSynthesis : MonoBehaviour
             int k = z + size.z;
             for (int i = x; i < x + size.x; i++)
             {
-                for (int j = z; j < y + size.y; j++)
+                for (int j = y; j < y + size.y; j++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -274,7 +274,7 @@ public class ModelSynthesis : MonoBehaviour
             int k = z - 1;
             for (int i = x; i < x + size.x; i++)
             {
-                for (int j = z; j < y + size.y; j++)
+                for (int j = y; j < y + size.y; j++)
                 {
                     if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
                     initialTiles.Add((i, j, k));
@@ -285,7 +285,7 @@ public class ModelSynthesis : MonoBehaviour
         // East
         {
             int i = x + size.x;
-            for (int j = z; j < y + size.y; j++)
+            for (int j = y; j < y + size.y; j++)
             {
                 for (int k = z; k < z + size.z; k++)
                 {
@@ -298,7 +298,7 @@ public class ModelSynthesis : MonoBehaviour
         // West
         {
             int i = x - 1;
-            for (int j = z; j < y + size.y; j++)
+            for (int j = y; j < y + size.y; j++)
             {
                 for (int k = z; k < z + size.z; k++)
                 {
@@ -458,9 +458,14 @@ public class ModelSynthesis : MonoBehaviour
                         }
                         if (failed) break;
                     }
-                    
-                    p.root = CanMultiTileBePlaced(x, y, z, p);
+
+                    if (!failed)
+                    {
+                        p.root = CanMultiTileBePlaced(x, y, z, p);
+                    }
                 }
+                
+                
 
                 if (!p.root)
                 {
@@ -587,7 +592,7 @@ public class ModelSynthesis : MonoBehaviour
             int k = z + size.z;
             for (int i = x; i < x + size.x; i++)
             {
-                for (int j = z; j < y + size.y; j++)
+                for (int j = y; j < y + size.y; j++)
                 {
                     if (!CheckDirection(i, j, k, Direction.NORTH)) return false;
                 }
@@ -599,7 +604,7 @@ public class ModelSynthesis : MonoBehaviour
             int k = z - 1;
             for (int i = x; i < x + size.x; i++)
             {
-                for (int j = z; j < y + size.y; j++)
+                for (int j = y; j < y + size.y; j++)
                 {
                     if (!CheckDirection(i, j, k, Direction.SOUTH)) return false;
                 }
@@ -609,7 +614,7 @@ public class ModelSynthesis : MonoBehaviour
         // East
         {
             int i = x + size.x;
-            for (int j = z; j < y + size.y; j++)
+            for (int j = y; j < y + size.y; j++)
             {
                 for (int k = z; k < z + size.z; k++)
                 {
@@ -621,7 +626,7 @@ public class ModelSynthesis : MonoBehaviour
         // West
         {
             int i = x - 1;
-            for (int j = z; j < y + size.y; j++)
+            for (int j = y; j < y + size.y; j++)
             {
                 for (int k = z; k < z + size.z; k++)
                 {
