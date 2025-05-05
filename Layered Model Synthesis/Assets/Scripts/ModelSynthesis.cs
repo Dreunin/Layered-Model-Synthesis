@@ -167,6 +167,7 @@ public class ModelSynthesis : MonoBehaviour
                         };
                         possibilities[x + i, y + j, z + k].Clear();
                         possibilities[x + i, y + j, z + k].Add(p);
+                        Debug.Log($"placed custom size object at ({x + i}, {y + j}, {z + k})");
                     }
                 }
             }
@@ -212,7 +213,7 @@ public class ModelSynthesis : MonoBehaviour
                 int ny = y + dy;
                 int nz = z + dz;
 
-                if (!InGrid(nx, ny, nz)) continue;
+                if (!InGrid(nx, ny, nz) || possibilities[nx, ny, nz].First().placed) continue;
                 q.Push((nx, ny, nz));
             }
         }
@@ -312,7 +313,8 @@ public class ModelSynthesis : MonoBehaviour
                         for (int k = 0; k < p.tile.customSize.z; k++)
                         {
                             //If in grid and possibilities contains same tile as non-root
-                            if(!InGrid(x+i, y+j, z+k) || !possibilities[x+i,y+j,z+k].Contains(p))
+                            if(!InGrid(x+i, y+j, z+k) || !possibilities[x+i,y+j,z+k].Contains(p) ||
+                               (possibilities[x + i, y + j, z + k].Count == 1 && possibilities[x+i,y+j,z+k].First().placed))
                             {
                                 p.root = false;
                                 failed = true;
@@ -335,7 +337,7 @@ public class ModelSynthesis : MonoBehaviour
                     int ny = y + dy;
                     int nz = z + dz;
 
-                    if (!InGrid(nx, ny, nz)) continue;
+                    if (!InGrid(nx, ny, nz) || possibilities[nx, ny, nz].First().placed) continue;
                     
                     q.Push((nx, ny, nz));
                 }
