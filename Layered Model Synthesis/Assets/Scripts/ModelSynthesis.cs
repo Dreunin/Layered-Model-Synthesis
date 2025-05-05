@@ -13,6 +13,7 @@ public class ModelSynthesis : MonoBehaviour
     [SerializeField] private int width;
     [SerializeField] private int length;
     [SerializeField] private int height;
+    public int seed;
     
     [Header("Animation")]
     [SerializeField] private bool animate;
@@ -67,7 +68,7 @@ public class ModelSynthesis : MonoBehaviour
     /// <returns></returns>
     public bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
 
-    public void BeginSynthesis()
+    public void BeginSynthesis(int seed)
     {
         //If in editor, never animate
         if (animate && Application.isEditor && !Application.isPlaying)
@@ -84,6 +85,7 @@ public class ModelSynthesis : MonoBehaviour
         
         InitializePossibilities();
 
+        Random.InitState(seed);
         Synthesise();
     }
 
@@ -167,7 +169,6 @@ public class ModelSynthesis : MonoBehaviour
                         };
                         possibilities[x + i, y + j, z + k].Clear();
                         possibilities[x + i, y + j, z + k].Add(p);
-                        Debug.Log($"placed custom size object at ({x + i}, {y + j}, {z + k})");
                     }
                 }
             }
