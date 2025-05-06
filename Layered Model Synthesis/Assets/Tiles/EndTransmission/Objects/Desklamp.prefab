@@ -149,7 +149,7 @@ MonoBehaviour:
   sameRotationWhenStacked: 0
   allowFreeRotation: 1
   dontInstantiate: 0
-  weight: 0.5
+  weight: 0.605
   customSize: {x: 1, y: 1, z: 1}
 --- !u!1001 &4987612391266518008
 PrefabInstance:

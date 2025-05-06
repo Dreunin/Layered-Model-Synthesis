@@ -2243,9 +2243,9 @@ MonoBehaviour:
   - {fileID: 7255677720918373021, guid: 9b19fb073391df24fa5051fa9f3998f6, type: 3}
   - {fileID: 491933689549037167, guid: 04148f9191ffdbd42b6c5179279ffd4a, type: 3}
   - {fileID: 491933689549037167, guid: 9c64c840c0fa09c429b423196cd709cb, type: 3}
-  allowRotation: 0
+  allowRotation: 1
   sameRotationWhenStacked: 0
   allowFreeRotation: 0
   dontInstantiate: 0
-  weight: 0.5
+  weight: 0.125
   customSize: {x: 1, y: 1, z: 1}

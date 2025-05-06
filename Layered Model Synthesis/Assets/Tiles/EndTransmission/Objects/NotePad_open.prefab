@@ -106,6 +106,7 @@ MonoBehaviour:
   - {fileID: 4291747830163367848, guid: 22cb23cc90c3196499e5fc0dfa8bf6a8, type: 3}
   allowedBelowList:
   - {fileID: 830709958335105142, guid: 0bb81fce499458d4a84e8c03da507e57, type: 3}
+  - {fileID: -7293958282713000360, guid: e0239dcfcb6a5df4db548482ef3daf8f, type: 3}
   allowedNorthList:
   - {fileID: 4065966629722668624, guid: 355a47b739df7f84199ae1b699ac1e25, type: 3}
   - {fileID: -7293958282713000360, guid: e0239dcfcb6a5df4db548482ef3daf8f, type: 3}
@@ -202,7 +203,7 @@ MonoBehaviour:
   - {fileID: 491933689549037167, guid: 9c64c840c0fa09c429b423196cd709cb, type: 3}
   allowRotation: 0
   sameRotationWhenStacked: 0
-  allowFreeRotation: 0
+  allowFreeRotation: 1
   dontInstantiate: 0
-  weight: 0.5
+  weight: 0.633
   customSize: {x: 1, y: 1, z: 1}

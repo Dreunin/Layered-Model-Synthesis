@@ -106,6 +106,7 @@ MonoBehaviour:
   - {fileID: -9185049944240717472, guid: 6f8b68e8959b4664fb6adbfa43415d19, type: 3}
   allowedBelowList:
   - {fileID: 830709958335105142, guid: 0bb81fce499458d4a84e8c03da507e57, type: 3}
+  - {fileID: -7293958282713000360, guid: e0239dcfcb6a5df4db548482ef3daf8f, type: 3}
   allowedNorthList:
   - {fileID: 4065966629722668624, guid: 355a47b739df7f84199ae1b699ac1e25, type: 3}
   - {fileID: -7293958282713000360, guid: e0239dcfcb6a5df4db548482ef3daf8f, type: 3}
