@@ -671,9 +671,52 @@ public class ModelSynthesis : MonoBehaviour
             foreach (Transform child in layer)
             {
                 child.gameObject.SetActive(true);
+                StartCoroutine(Enlarge(child.gameObject));
                 Instantiate(poof, child.position, Quaternion.identity);
                 yield return new WaitForSeconds(timePerChild);
             }
         }
     }
+
+    private IEnumerator Enlarge(GameObject tile)
+    {
+        Vector3 finalScale = tile.transform.localScale;
+        Vector3 overshootScale = finalScale * 1.125f;  
+        tile.transform.localScale = Vector3.zero;
+
+        float growDuration = 0.6f;
+        float settleDuration = 0.2f;
+
+        // Grow (overshoot)
+        float elapsed = 0f;
+        while (elapsed < growDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / growDuration;
+            float easedT = EaseOutBack(t, 1.70158f);
+            tile.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, overshootScale, easedT);
+            yield return null;
+        }
+
+        // Shrink (settle to final scale)
+        elapsed = 0f;
+        Vector3 startScale = tile.transform.localScale; // Current overshoot scale
+        while (elapsed < settleDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / settleDuration;
+            tile.transform.localScale = Vector3.Lerp(startScale, finalScale, t);
+            yield return null;
+        }
+
+        tile.transform.localScale = finalScale;
+    }
+
+
+    private float EaseOutBack(float t, float overshoot)
+    {
+        t -= 1;
+        return t * t * ((overshoot + 1) * t + overshoot) + 1;
+    }
+
 }
