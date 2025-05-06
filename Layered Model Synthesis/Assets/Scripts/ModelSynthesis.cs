@@ -47,12 +47,12 @@ public class ModelSynthesis : MonoBehaviour
             Debug.LogError("width, height and length must be greater than 0");
             return;
         }
-        
-        InitializePossibilities();
 
-        Random.InitState(seed);
         parentTransform = new GameObject($"Room {seed}").transform;
+        Random.InitState(seed);
+
         startTime = DateTime.Now;
+        InitializePossibilities();
         Synthesise();
     }
 
