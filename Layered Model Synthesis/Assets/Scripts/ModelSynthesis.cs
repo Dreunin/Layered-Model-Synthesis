@@ -5,68 +5,46 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-[ExecuteAlways] //Always, since we might want to record the synthesis process in-game
-public class ModelSynthesis : MonoBehaviour
+public class ModelSynthesis
 {
-    [Header("Settings")]
-    [SerializeField] private Tileset tileset;
-    [SerializeField] private int width;
-    [SerializeField] private int length;
-    [SerializeField] private int height;
-    public int seed;
-    
-    [Header("Animation")]
-    [SerializeField] private bool animate;
-    [SerializeField] float timeToAnimate = 10f;
-    [SerializeField] GameObject poof;
+    private Tileset tileset;
+    private int width;
+    private int length;
+    private int height;
 
     private HashSet<Possibility>[,,] possibilities;
-    private Transform parentTransform;
 
     private List<Tile> tiles => tileset.Tiles;
     private Tile border => tileset.Border;
-    private DateTime startTime;
+
+    public event Action<Vector3Int, Possibility> OnPlaceTile;
+
+    public ModelSynthesis(Tileset tileset, int width, int length, int height, int seed)
+    {
+        this.tileset = tileset;
+        this.width = width;
+        this.length = length;
+        this.height = height;
+        
+        Random.InitState(seed);
+        InitializePossibilities();
+    }
     
     /// <summary>
     /// Checks whether a coordinate is inside the grid area
     /// </summary>
     /// <returns></returns>
-    public bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
-
-    public void BeginSynthesis(int seed)
-    {
-        //If in editor, never animate
-        if (animate && Application.isEditor && !Application.isPlaying)
-        {
-            animate = false;
-            Debug.LogError("\"animate\" changed to FALSE; you are in editor mode.");
-        }
-        
-        if(width <= 0 || height <= 0 || length <= 0)
-        {
-            Debug.LogError("width, height and length must be greater than 0");
-            return;
-        }
-
-        parentTransform = new GameObject($"Room {seed}").transform;
-        Random.InitState(seed);
-
-        startTime = DateTime.Now;
-        InitializePossibilities();
-        Synthesise();
-    }
+    bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
 
     /// <summary>
     /// Synthesises the model by iterating through each tile in the grid and placing possible tiles to create a scene
     /// </summary>
-    private void Synthesise()
+    public void Synthesise()
     {
         MassPropagate();
         
         for (int y = 0; y < height; y++)
         {
-            Transform layerTransform = new GameObject($"Layer{y}").transform;
-            layerTransform.SetParent(parentTransform);
             for (int z = 0; z < length; z++)
             {
                 for (int x = 0; x < width; x++)
@@ -83,6 +61,7 @@ public class ModelSynthesis : MonoBehaviour
                     }
                     
                     Possibility newTile = Observe(x, y, z);
+                    
                     if (newTile.tile.IsCustomSize)
                     {
                         PropagateMultitile(x, y, z, newTile);
@@ -91,13 +70,11 @@ public class ModelSynthesis : MonoBehaviour
                     {
                         Propagate(x, y, z);
                     }
-                    PlaceTile(x, y, z, newTile,layerTransform);
+                    
+                    OnPlaceTile?.Invoke(new Vector3Int(x, y, z), newTile);
                 }
             }
         }
-        if(animate) StartCoroutine(nameof(AnimatePlaceTiles));
-        double timeTaken = (DateTime.Now - startTime).TotalSeconds;
-        Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
     }
     
     /// <summary>
@@ -431,8 +408,6 @@ public class ModelSynthesis : MonoBehaviour
                     }
                 }
                 
-                
-
                 if (!p.root)
                 {
                     bool foundRoot = false;
@@ -625,7 +600,6 @@ public class ModelSynthesis : MonoBehaviour
         return _possibilities;
     }
 
-
     private void InitializePossibilities()
     {
         possibilities = new HashSet<Possibility>[width, height, length];
@@ -641,82 +615,4 @@ public class ModelSynthesis : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// Places a tile (prefab) at the given coordinates.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <param name="tile"></param>
-    private void PlaceTile(int x, int y, int z, Possibility possibility, Transform parent)
-    {
-        if(possibility.tile.dontInstantiate) return; //If the tile is not supposed to be instantiated, we don't
-        Vector3 placement = new Vector3(x, y, z) + new Vector3(possibility.tile.GetRotatedSize(possibility.rotation).x-1,0, possibility.tile.GetRotatedSize(possibility.rotation).z-1) / 2f;
-        Tile newTile = Instantiate(possibility.tile, placement, possibility.GetRotation());
-        newTile.transform.SetParent(parent);
-        if(possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
-        if(animate) newTile.gameObject.SetActive(false);
-    }
-    
-    /// <summary>
-    /// Simple animation of tile placement accompanied by VFX. 
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator AnimatePlaceTiles()
-    {
-        float timePerChild = timeToAnimate / (height*length*width);
-        foreach (Transform layer in parentTransform)
-        {
-            foreach (Transform child in layer)
-            {
-                child.gameObject.SetActive(true);
-                StartCoroutine(Enlarge(child.gameObject));
-                Instantiate(poof, child.position, Quaternion.identity);
-                yield return new WaitForSeconds(timePerChild);
-            }
-        }
-    }
-
-    private IEnumerator Enlarge(GameObject tile)
-    {
-        Vector3 finalScale = tile.transform.localScale;
-        Vector3 overshootScale = finalScale * 1.125f;  
-        tile.transform.localScale = Vector3.zero;
-
-        float growDuration = 0.6f;
-        float settleDuration = 0.2f;
-
-        // Grow (overshoot)
-        float elapsed = 0f;
-        while (elapsed < growDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / growDuration;
-            float easedT = EaseOutBack(t, 1.70158f);
-            tile.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, overshootScale, easedT);
-            yield return null;
-        }
-
-        // Shrink (settle to final scale)
-        elapsed = 0f;
-        Vector3 startScale = tile.transform.localScale; // Current overshoot scale
-        while (elapsed < settleDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / settleDuration;
-            tile.transform.localScale = Vector3.Lerp(startScale, finalScale, t);
-            yield return null;
-        }
-
-        tile.transform.localScale = finalScale;
-    }
-
-
-    private float EaseOutBack(float t, float overshoot)
-    {
-        t -= 1;
-        return t * t * ((overshoot + 1) * t + overshoot) + 1;
-    }
-
 }

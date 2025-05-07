@@ -3,8 +3,8 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-[CustomEditor(typeof(ModelSynthesis))]
-public class ModelSynthesis_Inspector : Editor
+[CustomEditor(typeof(SynthesisController))]
+public class SynthesisController_Inspector : Editor
 {
     public override VisualElement CreateInspectorGUI() {
         VisualElement root = new();
@@ -29,8 +29,8 @@ public class ModelSynthesis_Inspector : Editor
     {
         return CreateButton("Synthesise (Seeded)", () =>
         {
-            int seed = (target as ModelSynthesis)!.seed;
-            (target as ModelSynthesis)?.BeginSynthesis(seed);
+            int seed = (target as SynthesisController)!.seed;
+            (target as SynthesisController)?.BeginSynthesis(seed);
         });
     }
     
@@ -39,7 +39,7 @@ public class ModelSynthesis_Inspector : Editor
         return CreateButton("Synthesise", () =>
         {
             int seed = (int) DateTime.Now.Ticks;
-            (target as ModelSynthesis)?.BeginSynthesis(seed);
+            (target as SynthesisController)?.BeginSynthesis(seed);
         });
     }
 
