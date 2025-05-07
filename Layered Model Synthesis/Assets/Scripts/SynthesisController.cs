@@ -3,8 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
+
+[Serializable]
+public enum AnimationMode
+{
+    NoAnimation, AnimateOnCompletion, AnimateOnPlacement
+}
+
+[Serializable]
+public enum RoomHandlingMode
+{
+    Default, DeleteExisting, MovePrevious
+}
 
 [ExecuteAlways] // Makes update also run in editor to make synthesis possible outside of play mode
 public class SynthesisController : MonoBehaviour
@@ -15,13 +26,15 @@ public class SynthesisController : MonoBehaviour
     [SerializeField] private int length;
     [SerializeField] private int height;
     public int seed;
+    [SerializeField] private Transform roomContainer;
+    [SerializeField] private RoomHandlingMode roomHandlingMode = RoomHandlingMode.Default;
 
     [Header("Animation")]
-    [SerializeField] private bool animate;
+    [SerializeField] private AnimationMode animationMode = AnimationMode.NoAnimation;
     [SerializeField] float timeToAnimate = 10f;
     [SerializeField] GameObject poof;
 
-    private Queue<IEnumerator> executionQueue = new Queue<IEnumerator>();
+    private Queue<IEnumerator> executionQueue = new();
 
     private void Update()
     {
@@ -37,10 +50,10 @@ public class SynthesisController : MonoBehaviour
     public void BeginSynthesis(int seed)
     {
         //If in editor, never animate
-        if (animate && Application.isEditor && !Application.isPlaying)
+        if (animationMode != AnimationMode.NoAnimation && Application.isEditor && !Application.isPlaying)
         {
-            animate = false;
-            Debug.LogError("\"animate\" changed to FALSE; you are in editor mode.");
+            animationMode = AnimationMode.NoAnimation;
+            Debug.LogError("\"animation mode\" changed to no animation; you are in editor mode.");
         }
         
         if(width <= 0 || height <= 0 || length <= 0)
@@ -49,7 +62,23 @@ public class SynthesisController : MonoBehaviour
             return;
         }
 
+        // Handle previous rooms
+        if (roomHandlingMode == RoomHandlingMode.DeleteExisting)
+        {
+            for (int i = roomContainer.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(roomContainer.GetChild(i).gameObject);
+            }
+        } else if (roomHandlingMode == RoomHandlingMode.MovePrevious)
+        {
+            foreach (Transform otherRoom in roomContainer)
+            {
+                otherRoom.position += new Vector3(0, 0, length + 5);
+            }
+        }
+        
         var room = new GameObject($"Room {seed}").transform;
+        room.SetParent(roomContainer);
         var startTime = DateTime.Now;
         
         var modelSynthesis = new ModelSynthesis(tileset, width, length, height, seed);
@@ -57,7 +86,7 @@ public class SynthesisController : MonoBehaviour
         modelSynthesis.OnFinish += () =>
         {
             double timeTaken = (DateTime.Now - startTime).TotalSeconds;
-            if(animate) AddTask(AnimatePlaceTiles(room));
+            if(animationMode == AnimationMode.AnimateOnCompletion) AddTask(AnimatePlaceTiles(room));
             Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
         };
 
@@ -94,8 +123,9 @@ public class SynthesisController : MonoBehaviour
         Vector3 placement = position + new Vector3(possibility.tile.GetRotatedSize(possibility.rotation).x-1,0, possibility.tile.GetRotatedSize(possibility.rotation).z-1) / 2f;
         Tile newTile = Instantiate(possibility.tile, placement, possibility.GetRotation());
         newTile.transform.SetParent(layer);
-        if(possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
-        if(animate) newTile.gameObject.SetActive(false);
+        if (possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
+        if (animationMode != AnimationMode.NoAnimation) newTile.gameObject.SetActive(false);
+        if (animationMode == AnimationMode.AnimateOnPlacement) AnimateTile(newTile.transform);
     }
     
     /// <summary>
@@ -108,12 +138,17 @@ public class SynthesisController : MonoBehaviour
         {
             foreach (Transform tile in layer)
             {
-                tile.gameObject.SetActive(true);
-                StartCoroutine(Enlarge(tile.gameObject));
-                Instantiate(poof, tile.position, Quaternion.identity);
+                AnimateTile(tile);
                 yield return new WaitForSeconds(timePerChild);
             }
         }
+    }
+
+    private void AnimateTile(Transform tile)
+    {
+        tile.gameObject.SetActive(true);
+        StartCoroutine(Enlarge(tile.gameObject));
+        Instantiate(poof, tile.position, Quaternion.identity);
     }
 
     private IEnumerator Enlarge(GameObject tile)
