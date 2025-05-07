@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
+[ExecuteAlways] // Makes update also run in editor to make synthesis possible outside of play mode
 public class SynthesisController : MonoBehaviour
 {
     [Header("Settings")]
@@ -18,7 +20,20 @@ public class SynthesisController : MonoBehaviour
     [SerializeField] private bool animate;
     [SerializeField] float timeToAnimate = 10f;
     [SerializeField] GameObject poof;
-    
+
+    private Queue<IEnumerator> executionQueue = new Queue<IEnumerator>();
+
+    private void Update()
+    {
+        lock (executionQueue)
+        {
+            while (executionQueue.Count > 0)
+            {
+                StartCoroutine(executionQueue.Dequeue());
+            }
+        }
+    }
+
     public void BeginSynthesis(int seed)
     {
         //If in editor, never animate
@@ -38,20 +53,35 @@ public class SynthesisController : MonoBehaviour
         var startTime = DateTime.Now;
         
         var modelSynthesis = new ModelSynthesis(tileset, width, length, height, seed);
-        modelSynthesis.OnPlaceTile += (position, possibility) => PlaceTile(position, possibility, room);
-        modelSynthesis.Synthesise();
-        
-        double timeTaken = (DateTime.Now - startTime).TotalSeconds;
-        if(animate) StartCoroutine(AnimatePlaceTiles(room));
-        Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
+        modelSynthesis.OnPlaceTile += (position, possibility) => AddTask(PlaceTile(position, possibility, room));
+        modelSynthesis.OnFinish += () =>
+        {
+            double timeTaken = (DateTime.Now - startTime).TotalSeconds;
+            if(animate) AddTask(AnimatePlaceTiles(room));
+            Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
+        };
+
+        new Thread(() =>
+        {
+            Thread.CurrentThread.IsBackground = true;
+            modelSynthesis.Synthesise();
+        }).Start();
+    }
+
+    private void AddTask(IEnumerator task)
+    {
+        lock (executionQueue)
+        {
+            executionQueue.Enqueue(task);
+        }
     }
     
     /// <summary>
     /// Places a tile (prefab) at the given coordinates.
     /// </summary>
-    private void PlaceTile(Vector3Int position, Possibility possibility, Transform room)
+    private IEnumerator PlaceTile(Vector3Int position, Possibility possibility, Transform room)
     {
-        if(possibility.tile.dontInstantiate) return; //If the tile is not supposed to be instantiated, we don't
+        if(possibility.tile.dontInstantiate) yield break; //If the tile is not supposed to be instantiated, we don't
         
         // Create layer if it doesn't exist
         for (int i = room.childCount; i <= position.y; i++)

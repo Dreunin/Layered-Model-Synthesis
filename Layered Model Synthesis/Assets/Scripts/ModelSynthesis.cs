@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using Random = System.Random;
 
 public class ModelSynthesis
 {
@@ -17,7 +17,10 @@ public class ModelSynthesis
     private List<Tile> tiles => tileset.Tiles;
     private Tile border => tileset.Border;
 
+    private Random random;
+
     public event Action<Vector3Int, Possibility> OnPlaceTile;
+    public event Action OnFinish;
 
     public ModelSynthesis(Tileset tileset, int width, int length, int height, int seed)
     {
@@ -26,7 +29,7 @@ public class ModelSynthesis
         this.length = length;
         this.height = height;
         
-        Random.InitState(seed);
+        random = new Random(seed);
         InitializePossibilities();
     }
     
@@ -75,6 +78,8 @@ public class ModelSynthesis
                 }
             }
         }
+        
+        OnFinish?.Invoke();
     }
     
     /// <summary>
@@ -148,7 +153,7 @@ public class ModelSynthesis
     {
         var pos = possibilities[x, y, z].ToArray().Where(p => p.root).ToArray();
         float totalWeight = pos.Sum(p => p.tile.weight);
-        float randomWeight = Random.Range(0, totalWeight);
+        double randomWeight = random.NextDouble() * totalWeight;
         float runningWeight = 0;
         foreach (var p in pos)
         {
