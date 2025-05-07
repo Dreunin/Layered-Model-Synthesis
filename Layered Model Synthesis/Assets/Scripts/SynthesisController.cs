@@ -89,11 +89,9 @@ public class SynthesisController : MonoBehaviour
     private IEnumerator Enlarge(GameObject tile)
     {
         Vector3 finalScale = tile.transform.localScale;
-        Vector3 overshootScale = finalScale * 1.125f;  
         tile.transform.localScale = Vector3.zero;
 
-        float growDuration = 0.6f;
-        float settleDuration = 0.2f;
+        float growDuration = 0.8f;
 
         // Grow (overshoot)
         float elapsed = 0f;
@@ -101,19 +99,8 @@ public class SynthesisController : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float t = elapsed / growDuration;
-            float easedT = EaseOutBack(t, 1.70158f);
-            tile.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, overshootScale, easedT);
-            yield return null;
-        }
-
-        // Shrink (settle to final scale)
-        elapsed = 0f;
-        Vector3 startScale = tile.transform.localScale; // Current overshoot scale
-        while (elapsed < settleDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / settleDuration;
-            tile.transform.localScale = Vector3.Lerp(startScale, finalScale, t);
+            float easedT = EaseOutBack(t, 1.8f);
+            tile.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, finalScale, easedT);
             yield return null;
         }
 
