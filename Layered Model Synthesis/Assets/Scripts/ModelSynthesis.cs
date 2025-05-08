@@ -32,6 +32,36 @@ public class ModelSynthesis
         random = new Random(seed);
         InitializePossibilities();
     }
+
+    public void PlaceTile(int x, int y, int z, Possibility possibility)
+    {
+        if (possibility.tile.IsCustomSize) //If multitile, we need to observe the other grid point the tile fills
+        {
+            Vector3Int vector = possibility.tile.GetRotatedSize(possibility.rotation);
+            for (int i = 0; i < vector.x; i++)
+            {
+                for (int j = 0; j < vector.y; j++)
+                {
+                    for (int k = 0; k < vector.z; k++)
+                    {
+                        var p = new Possibility(possibility.tile, possibility.rotation)
+                        {
+                            placed = true,
+                            root = i == 0 && j == 0 && k == 0
+                        };
+                        possibilities[x + i, y + j, z + k].Clear();
+                        possibilities[x + i, y + j, z + k].Add(p);
+                    }
+                }
+            }
+        }
+        else
+        {
+            possibility.placed = true;
+            possibilities[x, y, z].Clear();
+            possibilities[x, y, z].Add(possibility);
+        }
+    }
     
     /// <summary>
     /// Checks whether a coordinate is inside the grid area
@@ -93,6 +123,7 @@ public class ModelSynthesis
             {
                 for(int z = 0; z < length; z++)
                 {
+                    if (possibilities[x, y, z].First().placed) continue;
                     Propagate(x, y, z, true);
                 }
             }
@@ -110,32 +141,7 @@ public class ModelSynthesis
     {
         if (!InGrid(x, y, z)) return null;
         Possibility observed = PossibilityBasedOnWeight(x, y, z);
-        if (observed.tile.IsCustomSize) //If multitile, we need to observe the other grid point the tile fills
-        {
-            Vector3Int vector = observed.tile.GetRotatedSize(observed.rotation);
-            for (int i = 0; i < vector.x; i++)
-            {
-                for (int j = 0; j < vector.y; j++)
-                {
-                    for (int k = 0; k < vector.z; k++)
-                    {
-                        var p = new Possibility(observed.tile, observed.rotation)
-                        {
-                            placed = true,
-                            root = i == 0 && j == 0 && k == 0
-                        };
-                        possibilities[x + i, y + j, z + k].Clear();
-                        possibilities[x + i, y + j, z + k].Add(p);
-                    }
-                }
-            }
-        }
-        else
-        {
-            observed.placed = true;
-            possibilities[x, y, z].Clear();
-            possibilities[x, y, z].Add(observed);
-        }
+        PlaceTile(x, y, z, observed);
         return observed;
     }
 
