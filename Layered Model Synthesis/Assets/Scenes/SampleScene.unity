@@ -1187,7 +1187,7 @@ MonoBehaviour:
   roomContainer: {fileID: 708827128}
   roomHandlingMode: 2
   preplacedTilesContainer: {fileID: 490888306}
-  animationMode: 0
+  animationMode: 2
   timeToAnimate: 10
   poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
 --- !u!4 &1425575516
@@ -1418,7 +1418,7 @@ MonoBehaviour:
   roomContainer: {fileID: 708827128}
   roomHandlingMode: 2
   preplacedTilesContainer: {fileID: 0}
-  animationMode: 0
+  animationMode: 2
   timeToAnimate: 10
   poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
 --- !u!4 &1625851436
@@ -1488,7 +1488,7 @@ MonoBehaviour:
   roomContainer: {fileID: 708827128}
   roomHandlingMode: 2
   preplacedTilesContainer: {fileID: 0}
-  animationMode: 0
+  animationMode: 2
   timeToAnimate: 10
   poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
 --- !u!1 &2067586491
@@ -1563,7 +1563,7 @@ MonoBehaviour:
   roomContainer: {fileID: 708827128}
   roomHandlingMode: 2
   preplacedTilesContainer: {fileID: 0}
-  animationMode: 0
+  animationMode: 2
   timeToAnimate: 10
   poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
 --- !u!4 &2089422515

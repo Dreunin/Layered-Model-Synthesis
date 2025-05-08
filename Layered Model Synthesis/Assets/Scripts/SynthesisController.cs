@@ -164,7 +164,7 @@ public class SynthesisController : MonoBehaviour
     {
         tile.gameObject.SetActive(true);
         StartCoroutine(Enlarge(tile.gameObject));
-        Instantiate(poof, tile.position, Quaternion.identity);
+        if (poof != null) Instantiate(poof, tile.position, Quaternion.identity);
     }
 
     private IEnumerator Enlarge(GameObject tile)
