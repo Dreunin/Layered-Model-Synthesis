@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aba35ec511d44c4a9d0994094a51859, type: 3}
+  m_Name: Knots
+  m_EditorClassIdentifier: 
+  tiles:
+  - {fileID: 7217624564589633319, guid: 8600368708f4c7c499df112373d18919, type: 3}
+  - {fileID: 8291216505376791942, guid: 1d6b0a0578413e74796dd0cf4cd4a24e, type: 3}
+  - {fileID: 492140774712710031, guid: aeb4b91c74344e045aa2c0d17e1a4052, type: 3}
+  - {fileID: 8744186419149494018, guid: 7cd87c63247b6a14bbe24010a8d49859, type: 3}
+  border: {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
