@@ -117,6 +117,6 @@ MonoBehaviour:
   allowRotation: 0
   sameRotationWhenStacked: 0
   allowFreeRotation: 0
-  dontInstantiate: 0
+  dontInstantiate: 1
   weight: 0.605
   customSize: {x: 1, y: 1, z: 1}

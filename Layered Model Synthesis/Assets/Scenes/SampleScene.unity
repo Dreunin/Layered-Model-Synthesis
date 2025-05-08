@@ -610,7 +610,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1519566188}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &832575517
@@ -1150,6 +1151,61 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1375410838
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1375410840}
+  - component: {fileID: 1375410839}
+  m_Layer: 0
+  m_Name: Synthesiser (Knots)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1375410839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375410838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3239bd33517b499ebcaad0a667076c19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileset: {fileID: 11400000, guid: 4dd94c1ff57b9714c8f8aa99010595be, type: 2}
+  width: 10
+  length: 10
+  height: 5
+  seed: 0
+  roomContainer: {fileID: 708827128}
+  roomHandlingMode: 2
+  preplacedTilesContainer: {fileID: 0}
+  animationMode: 2
+  timeToAnimate: 10
+  poof: {fileID: 0}
+--- !u!4 &1375410840
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375410838}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1425575514
 GameObject:
   m_ObjectHideFlags: 0
@@ -1189,7 +1245,7 @@ MonoBehaviour:
   preplacedTilesContainer: {fileID: 490888306}
   animationMode: 2
   timeToAnimate: 10
-  poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
+  poof: {fileID: 0}
 --- !u!4 &1425575516
 Transform:
   m_ObjectHideFlags: 0
@@ -1204,6 +1260,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1519566187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1519566188}
+  m_Layer: 0
+  m_Name: Room -517028183
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1519566188
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519566187}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 708827128}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1565822654
 GameObject:
@@ -1420,7 +1507,7 @@ MonoBehaviour:
   preplacedTilesContainer: {fileID: 0}
   animationMode: 2
   timeToAnimate: 10
-  poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
+  poof: {fileID: 0}
 --- !u!4 &1625851436
 Transform:
   m_ObjectHideFlags: 0
@@ -1490,7 +1577,7 @@ MonoBehaviour:
   preplacedTilesContainer: {fileID: 0}
   animationMode: 2
   timeToAnimate: 10
-  poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
+  poof: {fileID: 0}
 --- !u!1 &2067586491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1565,7 +1652,7 @@ MonoBehaviour:
   preplacedTilesContainer: {fileID: 0}
   animationMode: 2
   timeToAnimate: 10
-  poof: {fileID: 6459832234443027547, guid: 3577e56ac0068064fb36e4bb3226fdf5, type: 3}
+  poof: {fileID: 0}
 --- !u!4 &2089422515
 Transform:
   m_ObjectHideFlags: 0
@@ -2076,6 +2163,7 @@ SceneRoots:
   - {fileID: 2003435003}
   - {fileID: 2089422515}
   - {fileID: 1625851436}
+  - {fileID: 1375410840}
   - {fileID: 1425575516}
   - {fileID: 708827128}
   - {fileID: 490888306}
