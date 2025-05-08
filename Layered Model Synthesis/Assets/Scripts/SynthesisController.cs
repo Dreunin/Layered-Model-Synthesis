@@ -28,6 +28,7 @@ public class SynthesisController : MonoBehaviour
     public int seed;
     [SerializeField] private Transform roomContainer;
     [SerializeField] private RoomHandlingMode roomHandlingMode = RoomHandlingMode.Default;
+    [SerializeField] private Transform preplacedTilesContainer;
 
     [Header("Animation")]
     [SerializeField] private AnimationMode animationMode = AnimationMode.NoAnimation;
@@ -82,7 +83,7 @@ public class SynthesisController : MonoBehaviour
         var startTime = DateTime.Now;
         
         var modelSynthesis = new ModelSynthesis(tileset, width, length, height, seed);
-        modelSynthesis.OnPlaceTile += (position, possibility) => AddTask(PlaceTile(position, possibility, room));
+        modelSynthesis.OnPlaceTile += (position, possibility) => AddTask(InstantiateTile(position, possibility, room));
         modelSynthesis.OnFinish += () =>
         {
             double timeTaken = (DateTime.Now - startTime).TotalSeconds;
@@ -90,11 +91,26 @@ public class SynthesisController : MonoBehaviour
             Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
         };
 
+        if (preplacedTilesContainer != null)
+        {
+            PreplaceTiles(modelSynthesis, room);
+        }
+
         new Thread(() =>
         {
             Thread.CurrentThread.IsBackground = true;
             modelSynthesis.Synthesise();
         }).Start();
+    }
+
+    private void PreplaceTiles(ModelSynthesis modelSynthesis, Transform room)
+    {
+        foreach (PreplacedTile preplacedTile in preplacedTilesContainer.GetComponentsInChildren<PreplacedTile>())
+        {
+            Possibility possibility = new Possibility(preplacedTile.tile, preplacedTile.rotation);
+            modelSynthesis.PlaceTile(preplacedTile.gridPosition.x, preplacedTile.gridPosition.y, preplacedTile.gridPosition.z, possibility);
+            AddTask(InstantiateTile(preplacedTile.gridPosition, possibility, room));
+        }
     }
 
     private void AddTask(IEnumerator task)
@@ -108,7 +124,7 @@ public class SynthesisController : MonoBehaviour
     /// <summary>
     /// Places a tile (prefab) at the given coordinates.
     /// </summary>
-    private IEnumerator PlaceTile(Vector3Int position, Possibility possibility, Transform room)
+    private IEnumerator InstantiateTile(Vector3Int position, Possibility possibility, Transform room)
     {
         if(possibility.tile.dontInstantiate) yield break; //If the tile is not supposed to be instantiated, we don't
         
