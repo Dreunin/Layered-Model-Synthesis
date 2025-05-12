@@ -89,7 +89,7 @@ public class SynthesisController : MonoBehaviour
         modelSynthesis.OnFinish += () =>
         {
             double timeTaken = (DateTime.Now - startTime).TotalSeconds;
-            if(animationMode == AnimationMode.AnimateOnCompletion && Application.isPlaying) AddTask(AnimatePlaceTiles(room));
+                if(animationMode == AnimationMode.AnimateOnCompletion) AddTask(AnimatePlaceTiles(room));
             Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
         };
 
@@ -156,6 +156,8 @@ public class SynthesisController : MonoBehaviour
     /// </summary>
     private IEnumerator AnimatePlaceTiles(Transform room)
     {
+        if (!Application.isPlaying) yield break;
+        
         float timePerChild = timeToAnimate / (height*length*width);
         foreach (Transform layer in room)
         {
