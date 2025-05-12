@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4503808520712522880}
-  - component: {fileID: 492140774712710031}
+  - component: {fileID: 8744186419149494018}
   m_Layer: 0
-  m_Name: Line
+  m_Name: T Reverse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 5962704712011110403}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &492140774712710031
+--- !u!114 &8744186419149494018
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -53,30 +53,28 @@ MonoBehaviour:
   allowedBelowList:
   - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
   allowedNorthList:
+  - {fileID: 7217624564589633319, guid: 2fb07545799a15649b84bf8f1f37fbe9, type: 3}
+  - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
   - {fileID: 7217624564589633319, guid: a08bd90d425f5f34a9908a4df0ae874c, type: 3}
   - {fileID: 8744186419149494018, guid: 7cd87c63247b6a14bbe24010a8d49859, type: 3}
-  - {fileID: 492140774712710031}
-  - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
-  - {fileID: 7217624564589633319, guid: 2fb07545799a15649b84bf8f1f37fbe9, type: 3}
   allowedEastList:
   - {fileID: 7217624564589633319, guid: 8600368708f4c7c499df112373d18919, type: 3}
   - {fileID: 8291216505376791942, guid: 1d6b0a0578413e74796dd0cf4cd4a24e, type: 3}
-  - {fileID: 492140774712710031}
-  - {fileID: 8744186419149494018, guid: 7cd87c63247b6a14bbe24010a8d49859, type: 3}
   - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
   - {fileID: 7217624564589633319, guid: 2fb07545799a15649b84bf8f1f37fbe9, type: 3}
+  - {fileID: 8744186419149494018, guid: 7cd87c63247b6a14bbe24010a8d49859, type: 3}
+  - {fileID: 8744186419149494018}
   allowedSouthList:
-  - {fileID: 492140774712710031}
-  - {fileID: 7217624564589633319, guid: a08bd90d425f5f34a9908a4df0ae874c, type: 3}
+  - {fileID: 7217624564589633319, guid: 2fb07545799a15649b84bf8f1f37fbe9, type: 3}
+  - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
   - {fileID: 7217624564589633319, guid: 8600368708f4c7c499df112373d18919, type: 3}
-  - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
-  - {fileID: 7217624564589633319, guid: 2fb07545799a15649b84bf8f1f37fbe9, type: 3}
-  allowedWestList:
-  - {fileID: 8744186419149494018, guid: 7cd87c63247b6a14bbe24010a8d49859, type: 3}
   - {fileID: 8291216505376791942, guid: 1d6b0a0578413e74796dd0cf4cd4a24e, type: 3}
-  - {fileID: 492140774712710031}
-  - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
+  allowedWestList:
   - {fileID: 7217624564589633319, guid: 2fb07545799a15649b84bf8f1f37fbe9, type: 3}
+  - {fileID: 6709761438019564598, guid: 4f5f779b53b4f6447ac71dadeabab3b1, type: 3}
+  - {fileID: 8291216505376791942, guid: 1d6b0a0578413e74796dd0cf4cd4a24e, type: 3}
+  - {fileID: 8744186419149494018, guid: 7cd87c63247b6a14bbe24010a8d49859, type: 3}
+  - {fileID: 8744186419149494018}
   allowRotation: 0
   sameRotationWhenStacked: 0
   allowFreeRotation: 0
@@ -110,13 +108,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8889238271791200196}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4503808520712522880}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &2260903132848703124
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -148,7 +146,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 01256f335032a4d45b44963a8d11968d, type: 2}
+  - {fileID: 2100000, guid: df2a3a94ff13f0c4c827cc5f07ea4ca7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
