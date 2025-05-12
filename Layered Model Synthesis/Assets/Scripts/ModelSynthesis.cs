@@ -33,6 +33,16 @@ public class ModelSynthesis
         random = new Random(seed);
         InitializePossibilities();
     }
+    
+    /// <summary>
+    /// Checks whether a coordinate is inside the grid area
+    /// </summary>
+    private bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
+    
+    /// <summary>
+    /// Checks whether a tile is placed at the given coordinates
+    /// </summary>
+    private bool IsPlaced(int x, int y, int z) => possibilities[x, y, z].Count > 0 && possibilities[x, y, z].First().placed;
 
     /// <summary>
     /// Clears all other possibilities from the grid point and places the given tile at the given coordinates.
@@ -42,21 +52,15 @@ public class ModelSynthesis
         if (possibility.tile.IsCustomSize) //If multitile, we need to observe the other grid point the tile fills
         {
             Vector3Int size = possibility.tile.GetRotatedSize(possibility.rotation);
-            for (int i = 0; i < size.x; i++)
+            foreach (var (i, j, k) in Util.Iterate3D(size))
             {
-                for (int j = 0; j < size.y; j++)
+                var p = new Possibility(possibility.tile, possibility.rotation)
                 {
-                    for (int k = 0; k < size.z; k++)
-                    {
-                        var p = new Possibility(possibility.tile, possibility.rotation)
-                        {
-                            placed = true,
-                            root = i == 0 && j == 0 && k == 0
-                        };
-                        possibilities[x + i, y + j, z + k].Clear();
-                        possibilities[x + i, y + j, z + k].Add(p);
-                    }
-                }
+                    placed = true,
+                    root = i == 0 && j == 0 && k == 0
+                };
+                possibilities[x + i, y + j, z + k].Clear();
+                possibilities[x + i, y + j, z + k].Add(p);
             }
         }
         else
@@ -66,11 +70,6 @@ public class ModelSynthesis
             possibilities[x, y, z].Add(possibility);
         }
     }
-    
-    /// <summary>
-    /// Checks whether a coordinate is inside the grid area
-    /// </summary>
-    bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
 
     /// <summary>
     /// Synthesises the model by iterating through each tile in the grid and placing possible tiles to create a scene
@@ -78,29 +77,20 @@ public class ModelSynthesis
     public void Synthesise()
     {
         MassPropagate();
-        
-        for (int y = 0; y < height; y++)
-        {
-            for (int z = 0; z < length; z++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    if (possibilities[x, y, z].Count == 0)
-                    {
-                        Debug.LogError($"No possibilities left at ({x}, {y}, {z})");
-                        return;
-                    }
 
-                    if (possibilities[x, y, z].First().placed)
-                    {
-                        continue;
-                    }
-                    
-                    Possibility newTile = Observe(x, y, z);
-                    PropagateFromNeighbours(x, y, z, newTile);
-                    OnPlaceTile?.Invoke(new Vector3Int(x, y, z), newTile);
-                }
+        foreach (var (x, y, z) in Util.Iterate3D(width, height, length))
+        {
+            if (possibilities[x, y, z].Count == 0)
+            {
+                throw new Exception($"No possibilities left at ({x}, {y}, {z})");
+                return;
             }
+
+            if (IsPlaced(x, y, z)) continue;
+                    
+            Possibility newTile = Observe(x, y, z);
+            PropagateFromNeighbours(x, y, z, newTile);
+            OnPlaceTile?.Invoke(new Vector3Int(x, y, z), newTile);
         }
         
         OnFinish?.Invoke();
@@ -111,16 +101,10 @@ public class ModelSynthesis
     /// </summary>
     private void MassPropagate()
     {
-        for(int x = 0; x < width; x++)
+        foreach (var (x, y, z) in Util.Iterate3D(width, height, length))
         {
-            for(int y = 0; y < height; y++)
-            {
-                for(int z = 0; z < length; z++)
-                {
-                    if (possibilities[x, y, z].First().placed) continue;
-                    PropagateFromSelf(x, y, z);
-                }
-            }
+            if (IsPlaced(x, y, z)) continue;
+            PropagateFromSelf(x, y, z);
         }
     }
 
@@ -142,7 +126,7 @@ public class ModelSynthesis
     /// </summary>
     private Possibility PossibilityBasedOnWeight(int x, int y, int z)
     {
-        var pos = possibilities[x, y, z].ToArray().Where(p => p.root).ToArray();
+        var pos = possibilities[x, y, z].Where(p => p.root).ToArray();
         float totalWeight = pos.Sum(p => p.tile.weight);
         double randomWeight = random.NextDouble() * totalWeight;
         float runningWeight = 0;
@@ -168,7 +152,7 @@ public class ModelSynthesis
         {
             foreach (var (nx, ny, nz) in GetNeighbours(x, y, z, possibility, d))
             {
-                if (!InGrid(nx, ny, nz) || possibilities[nx, ny, nz].First().placed) continue;
+                if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz)) continue;
                 initialTiles.Add((nx, ny, nz));
             }
         }
@@ -206,21 +190,13 @@ public class ModelSynthesis
 
             ConstrainByNeighbours(x, y, z);
             
-            //Multi-tile tiles
-            HashSet<Possibility> toRemove = new HashSet<Possibility>();
-            foreach (var p in possibilities[x, y, z].Where(p => p.tile.IsCustomSize))
+            // Multi-tile tiles
+            foreach (var p in possibilities[x, y, z].Where(p => p.tile.IsCustomSize && p.root))
             {
-                if (p.root)
-                {
-                    p.root = DoesMultiTileFit(x, y, z, p) && CanMultiTileBePlaced(x, y, z, p);
-                }
-                
-                if (!p.root && !IsRootInRange(x, y, z, p))
-                {
-                    toRemove.Add(p);
-                }
+                p.root = DoesMultiTileFit(x, y, z, p) && CanMultiTileBePlaced(x, y, z, p);
             }
-            possibilities[x, y, z].ExceptWith(toRemove);
+
+            possibilities[x, y, z].RemoveWhere(p => p.tile.IsCustomSize && !p.root && !IsRootInRange(x, y, z, p));
             
             if (possibilities[x, y, z].Count == 0)
             {
@@ -237,7 +213,7 @@ public class ModelSynthesis
                     int ny = y + dy;
                     int nz = z + dz;
 
-                    if (!InGrid(nx, ny, nz) || possibilities[nx, ny, nz].First().placed) continue;
+                    if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz)) continue;
                     
                     q.Push((nx, ny, nz));
                 }
@@ -300,17 +276,10 @@ public class ModelSynthesis
                 HashSet<Possibility> allowedByNeighbourPossibilities = PossibilitiesFromTiles(allowedByNeighbour);
                 
                 // Enforce above tiles follow below rotation.
-                if(d == Direction.BELOW && possibilities[nx,ny,nz].First().placed && possibilities[nx,ny,nz].First().tile.sameRotationWhenStacked)
+                if (d == Direction.BELOW && IsPlaced(nx, ny, nz) && possibilities[nx, ny, nz].First().tile.sameRotationWhenStacked)
                 {
-                    // We remove any possibility that doesn't have the same rotation as the tile below
-                    for (int i = allowedByNeighbourPossibilities.Count - 1; i >= 0; i--)
-                    {
-                        Possibility p = allowedByNeighbourPossibilities.ElementAt(i);
-                        if (p.tile.allowRotation && possibilities[nx, ny, nz].First().rotation != p.rotation)
-                        {
-                            allowedByNeighbourPossibilities.Remove(p);
-                        }
-                    }
+                    allowedByNeighbourPossibilities.RemoveWhere(p =>
+                        p.tile.allowRotation && possibilities[nx, ny, nz].First().rotation != p.rotation);
                 }
                 
                 possibilities[x, y, z].IntersectWith(allowedByNeighbourPossibilities);
@@ -324,19 +293,13 @@ public class ModelSynthesis
     private bool DoesMultiTileFit(int x, int y, int z, Possibility possibility)
     {
         Vector3Int size = possibility.tile.GetRotatedSize(possibility.rotation);
-        for (int i = 0; i < size.x; i++)
+        foreach (var (i, j, k) in Util.Iterate3D(size))
         {
-            for (int j = 0; j < size.y; j++)
+            //If in grid and possibilities contains same tile as non-root
+            if(!InGrid(x + i, y + j, z + k) || !possibilities[x + i, y + j, z + k].Contains(possibility) ||
+               IsPlaced(x + i, y + j, z + k))
             {
-                for (int k = 0; k < size.z; k++)
-                {
-                    //If in grid and possibilities contains same tile as non-root
-                    if(!InGrid(x+i, y+j, z+k) || !possibilities[x+i,y+j,z+k].Contains(possibility) ||
-                       (possibilities[x + i, y + j, z + k].Count == 1 && possibilities[x+i,y+j,z+k].First().placed))
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
         }
 
@@ -385,17 +348,11 @@ public class ModelSynthesis
     private bool IsRootInRange(int x, int y, int z, Possibility possibility)
     {
         Vector3Int size = possibility.tile.GetRotatedSize(possibility.rotation);
-        for (int i = 0; i < size.x; i++)
+        foreach (var (i, j, k) in Util.Iterate3D(size))
         {
-            for (int j = 0; j < size.y; j++)
+            if (InGrid(x - i, y - j, z - k) && possibilities[x - i, y - j, z - k].Any(p2 => p2.Equals(possibility) && p2.root))
             {
-                for (int k = 0; k < size.z; k++)
-                {
-                    if (InGrid(x-i,y-j,z-k) && possibilities[x - i, y - j, z - k].Any(p2 => p2.Equals(possibility) && p2.root))
-                    {
-                        return true;
-                    }
-                }
+                return true;
             }
         }
 
@@ -431,16 +388,10 @@ public class ModelSynthesis
     private void InitializePossibilities()
     {
         possibilities = new HashSet<Possibility>[width, height, length];
-        for (int x = 0; x < width; x++)
+        foreach (var (x, y, z) in Util.Iterate3D(width, height, length))
         {
-            for (int y = 0; y < height; y++)
-            {
-                for (int z = 0; z < length; z++)
-                {
-                    HashSet<Possibility> allPossibleTiles = PossibilitiesFromTiles(new HashSet<Tile>(tiles));
-                    possibilities[x, y, z] = new HashSet<Possibility>(allPossibleTiles);
-                }
-            }
+            HashSet<Possibility> allPossibleTiles = PossibilitiesFromTiles(new HashSet<Tile>(tiles));
+            possibilities[x, y, z] = new HashSet<Possibility>(allPossibleTiles);
         }
     }
 
