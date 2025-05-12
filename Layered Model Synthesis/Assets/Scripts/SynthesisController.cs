@@ -33,7 +33,6 @@ public class SynthesisController : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private AnimationMode animationMode = AnimationMode.NoAnimation;
     [SerializeField] float timeToAnimate = 10f;
-    [SerializeField] GameObject poof;
 
     private Queue<IEnumerator> executionQueue = new();
 
@@ -164,7 +163,6 @@ public class SynthesisController : MonoBehaviour
     {
         tile.gameObject.SetActive(true);
         StartCoroutine(Enlarge(tile.gameObject));
-        if (poof != null) Instantiate(poof, tile.position, Quaternion.identity);
     }
 
     private IEnumerator Enlarge(GameObject tile)
