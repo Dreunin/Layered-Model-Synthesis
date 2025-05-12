@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Random = UnityEngine.Random;
 
 [Serializable]
@@ -89,8 +90,9 @@ public class SynthesisController : MonoBehaviour
         modelSynthesis.OnFinish += () =>
         {
             double timeTaken = (DateTime.Now - startTime).TotalSeconds;
-                if(animationMode == AnimationMode.AnimateOnCompletion) AddTask(AnimatePlaceTiles(room));
+            if(animationMode == AnimationMode.AnimateOnCompletion) AddTask(AnimatePlaceTiles(room));
             Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
+            ReportPerformance(modelSynthesis);
         };
 
         if (preplacedTilesContainer != null)
@@ -101,7 +103,9 @@ public class SynthesisController : MonoBehaviour
         new Thread(() =>
         {
             Thread.CurrentThread.IsBackground = true;
+            Profiler.BeginThreadProfiling("Model Synthesis", Thread.CurrentThread.ManagedThreadId.ToString());
             modelSynthesis.Synthesise();
+            Profiler.EndThreadProfiling();
         }).Start();
     }
 
@@ -124,6 +128,26 @@ public class SynthesisController : MonoBehaviour
         {
             executionQueue.Enqueue(task);
         }
+    }
+
+    private void ReportPerformance(ModelSynthesis synthesis)
+    {
+        synthesis.totalPM.Report();
+        synthesis.initializationPM.Report();        
+        synthesis.massPropagatePM.Report();
+        synthesis.propagatePM.Report();
+        synthesis.propagate2PM.Report();
+        synthesis.constrainPM.Report();
+        synthesis.observePM.Report();
+        synthesis.propagateMultitilePM.Report();
+        synthesis.multiTileFitPM.Report();
+        synthesis.multiTilePlacePM.Report();
+        synthesis.rootInRangePM.Report();
+        synthesis.addToQueuePM.Report();
+        synthesis.propagateNeighboursPM.Report();
+        synthesis.popPM.Report();
+        synthesis.stackPM.Report();
+        Debug.Log($"Total tiles propagated: {synthesis.tilesPropagated}");
     }
     
     /// <summary>
@@ -150,7 +174,6 @@ public class SynthesisController : MonoBehaviour
     }
     
 #region TilePlacementAnimation
-    
     /// <summary>
     /// Simple animation of tile placement. 
     /// </summary>
