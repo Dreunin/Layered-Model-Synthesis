@@ -142,7 +142,7 @@ public class SynthesisController : MonoBehaviour
         Transform layer = room.GetChild(position.y);
         
         Vector3 placement = position + new Vector3(possibility.tile.GetRotatedSize(possibility.rotation).x-1,0, possibility.tile.GetRotatedSize(possibility.rotation).z-1) / 2f;
-        Tile newTile = Instantiate(possibility.tile, placement, possibility.GetRotation());
+        Tile newTile = Instantiate(possibility.tile, placement, possibility.GetQuaternion());
         newTile.transform.SetParent(layer);
         if (possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
         if (animationMode != AnimationMode.NoAnimation && Application.isPlaying) newTile.gameObject.SetActive(false);
