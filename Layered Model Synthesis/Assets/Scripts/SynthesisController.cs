@@ -56,8 +56,7 @@ public class SynthesisController : MonoBehaviour
         //If in editor, never animate
         if (animationMode != AnimationMode.NoAnimation && Application.isEditor && !Application.isPlaying)
         {
-            animationMode = AnimationMode.NoAnimation;
-            Debug.LogError("\"animation mode\" changed to no animation; you are in editor mode.");
+            Debug.LogWarning("Animations do not work in edit mode");
         }
         
         if(width <= 0 || height <= 0 || length <= 0)
@@ -90,7 +89,7 @@ public class SynthesisController : MonoBehaviour
         modelSynthesis.OnFinish += () =>
         {
             double timeTaken = (DateTime.Now - startTime).TotalSeconds;
-            if(animationMode == AnimationMode.AnimateOnCompletion) AddTask(AnimatePlaceTiles(room));
+            if(animationMode == AnimationMode.AnimateOnCompletion && Application.isPlaying) AddTask(AnimatePlaceTiles(room));
             Debug.Log($"Model Synthesis complete. Took {(int)timeTaken} seconds.");
         };
 
@@ -146,8 +145,8 @@ public class SynthesisController : MonoBehaviour
         Tile newTile = Instantiate(possibility.tile, placement, possibility.GetRotation());
         newTile.transform.SetParent(layer);
         if (possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
-        if (animationMode != AnimationMode.NoAnimation) newTile.gameObject.SetActive(false);
-        if (animationMode == AnimationMode.AnimateOnPlacement) AnimateTile(newTile.transform);
+        if (animationMode != AnimationMode.NoAnimation && Application.isPlaying) newTile.gameObject.SetActive(false);
+        if (animationMode == AnimationMode.AnimateOnPlacement && Application.isPlaying) AnimateTile(newTile.transform);
     }
     
 #region TilePlacementAnimation
