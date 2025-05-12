@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
+/// <summary>
+/// A Possibility is a tile with a rotation that is viable to place at a specific coordinates in the grid. 
+/// </summary>
 public class Possibility 
 {
     public Tile tile;

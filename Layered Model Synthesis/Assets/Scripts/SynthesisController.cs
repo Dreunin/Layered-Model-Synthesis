@@ -17,7 +17,7 @@ public enum RoomHandlingMode
     Default, DeleteExisting, MovePrevious
 }
 
-[ExecuteAlways] // Makes update also run in editor to make synthesis possible outside of play mode
+[ExecuteAlways] // Makes Update also run in editor to make synthesis possible outside of playmode
 public class SynthesisController : MonoBehaviour
 {
     [Header("Settings")]
@@ -34,7 +34,7 @@ public class SynthesisController : MonoBehaviour
     [SerializeField] private AnimationMode animationMode = AnimationMode.NoAnimation;
     [SerializeField] float timeToAnimate = 10f;
 
-    private Queue<IEnumerator> executionQueue = new();
+    private Queue<IEnumerator> executionQueue = new(); // Queue of tasks to be executed in the Update loop (
 
     private void Update()
     {
@@ -47,6 +47,10 @@ public class SynthesisController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Begins the synthesis process. Can be started in-editor or at runtime and handles previous rooms based on selected RoomHandlingMode.
+    /// </summary>
+    /// <see cref="RoomHandlingMode"/>
     public void BeginSynthesis(int seed)
     {
         //If in editor, never animate
@@ -102,6 +106,9 @@ public class SynthesisController : MonoBehaviour
         }).Start();
     }
 
+    /// <summary>
+    /// Finds all preplaced tiles in the preplacedTilesContainer and places them in the possibilities grid.
+    /// </summary>
     private void PreplaceTiles(ModelSynthesis modelSynthesis, Transform room)
     {
         foreach (PreplacedTile preplacedTile in preplacedTilesContainer.GetComponentsInChildren<PreplacedTile>())
@@ -121,7 +128,7 @@ public class SynthesisController : MonoBehaviour
     }
     
     /// <summary>
-    /// Places a tile (prefab) at the given coordinates.
+    /// Intantiates a tile (the prefab) at the given coordinates.
     /// </summary>
     private IEnumerator InstantiateTile(Vector3Int position, Possibility possibility, Transform room)
     {
@@ -143,8 +150,10 @@ public class SynthesisController : MonoBehaviour
         if (animationMode == AnimationMode.AnimateOnPlacement) AnimateTile(newTile.transform);
     }
     
+#region TilePlacementAnimation
+    
     /// <summary>
-    /// Simple animation of tile placement accompanied by VFX. 
+    /// Simple animation of tile placement. 
     /// </summary>
     private IEnumerator AnimatePlaceTiles(Transform room)
     {
@@ -192,4 +201,5 @@ public class SynthesisController : MonoBehaviour
         t -= 1;
         return t * t * ((overshoot + 1) * t + overshoot) + 1;
     }
+#endregion
 }

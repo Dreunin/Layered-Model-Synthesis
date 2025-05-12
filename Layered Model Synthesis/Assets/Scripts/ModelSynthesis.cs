@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 using Random = System.Random;
 
@@ -33,16 +34,19 @@ public class ModelSynthesis
         InitializePossibilities();
     }
 
+    /// <summary>
+    /// Clears all other possibilities from the grid point and places the given tile at the given coordinates.
+    /// </summary>
     public void PlaceTile(int x, int y, int z, Possibility possibility)
     {
         if (possibility.tile.IsCustomSize) //If multitile, we need to observe the other grid point the tile fills
         {
-            Vector3Int vector = possibility.tile.GetRotatedSize(possibility.rotation);
-            for (int i = 0; i < vector.x; i++)
+            Vector3Int size = possibility.tile.GetRotatedSize(possibility.rotation);
+            for (int i = 0; i < size.x; i++)
             {
-                for (int j = 0; j < vector.y; j++)
+                for (int j = 0; j < size.y; j++)
                 {
-                    for (int k = 0; k < vector.z; k++)
+                    for (int k = 0; k < size.z; k++)
                     {
                         var p = new Possibility(possibility.tile, possibility.rotation)
                         {
@@ -66,7 +70,6 @@ public class ModelSynthesis
     /// <summary>
     /// Checks whether a coordinate is inside the grid area
     /// </summary>
-    /// <returns></returns>
     bool InGrid(int x, int y, int z) => x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
 
     /// <summary>
@@ -94,16 +97,7 @@ public class ModelSynthesis
                     }
                     
                     Possibility newTile = Observe(x, y, z);
-                    
-                    if (newTile.tile.IsCustomSize)
-                    {
-                        PropagateMultitile(x, y, z, newTile);
-                    }
-                    else
-                    {
-                        Propagate(x, y, z);
-                    }
-                    
+                    PropagateFromNeighbours(x, y, z, newTile);
                     OnPlaceTile?.Invoke(new Vector3Int(x, y, z), newTile);
                 }
             }
@@ -124,7 +118,7 @@ public class ModelSynthesis
                 for(int z = 0; z < length; z++)
                 {
                     if (possibilities[x, y, z].First().placed) continue;
-                    Propagate(x, y, z, true);
+                    PropagateFromSelf(x, y, z);
                 }
             }
         }
@@ -133,10 +127,6 @@ public class ModelSynthesis
     /// <summary>
     /// Randomly selects a tile from the possibilities at the given coordinates
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <returns></returns>
     private Possibility Observe(int x, int y, int z)
     {
         if (!InGrid(x, y, z)) return null;
@@ -150,11 +140,6 @@ public class ModelSynthesis
     /// Used to select a tile to place in the grid.
     /// The weight is used to determine the probability of selecting a tile. The higher the weight, the more likely it is to be selected.
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
     private Possibility PossibilityBasedOnWeight(int x, int y, int z)
     {
         var pos = possibilities[x, y, z].ToArray().Where(p => p.root).ToArray();
@@ -174,133 +159,33 @@ public class ModelSynthesis
     }
 
     /// <summary>
-    /// Propagates around multi-tile tiles. Ensures proper updates to the grid after multi-tile placement. 
+    /// Runs propagate from the neighbours around tile (x, y, z).
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <param name="multiTile"></param>
-    private void PropagateMultitile(int x, int y, int z, Possibility multiTile)
-    {
-        Vector3Int size = multiTile.tile.GetRotatedSize(multiTile.rotation);
-        var initialTiles = new List<(int x, int y, int z)>();
-        // Above
-        {
-            int j = y + size.y;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
-                    initialTiles.Add((i, j, k));
-                }
-            }
-        }
-        
-        // Below
-        {
-            int j = y - 1;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
-                    initialTiles.Add((i, j, k));
-                }
-            }
-        }
-        
-        // North
-        {
-            int k = z + size.z;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int j = y; j < y + size.y; j++)
-                {
-                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
-                    initialTiles.Add((i, j, k));
-                }
-            }
-        }
-        
-        // South
-        {
-            int k = z - 1;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int j = y; j < y + size.y; j++)
-                {
-                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
-                    initialTiles.Add((i, j, k));
-                }
-            }
-        }
-        
-        // East
-        {
-            int i = x + size.x;
-            for (int j = y; j < y + size.y; j++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
-                    initialTiles.Add((i, j, k));
-                }
-            }
-        }
-        
-        // West
-        {
-            int i = x - 1;
-            for (int j = y; j < y + size.y; j++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!InGrid(i, j, k) || possibilities[i, j, k].First().placed) continue;
-                    initialTiles.Add((i, j, k));
-                }
-            }
-        }
-        
-        Propagate(x, y, z, initialTiles);
-    }
-
-    /// <summary>
-    /// Overloaded version of Propagate that determines which initial tiles to propagate from based on the propgateFromSelf parameter.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <param name="propagateFromSelf">If false: propagate from each neighbour tile - if true: propagate from (x, y, z)</param>
-    private void Propagate(int x, int y, int z, bool propagateFromSelf = false)
+    private void PropagateFromNeighbours(int x, int y, int z, Possibility possibility)
     {
         var initialTiles = new List<(int x, int y, int z)>();
-        if (!propagateFromSelf)
+        foreach (Direction d in DirectionExtensions.GetDirections())
         {
-            foreach (Direction d in DirectionExtensions.GetDirections()) //Add each neighbour to queue
+            foreach (var (nx, ny, nz) in GetNeighbours(x, y, z, possibility, d))
             {
-                (int dx, int dy, int dz) = d.ToOffset();
-                int nx = x + dx;
-                int ny = y + dy;
-                int nz = z + dz;
-
                 if (!InGrid(nx, ny, nz) || possibilities[nx, ny, nz].First().placed) continue;
                 initialTiles.Add((nx, ny, nz));
             }
         }
-        else
-        {
-            initialTiles.Add((x, y, z)); // Start with the initial tile
-        }
         Propagate(x, y, z, initialTiles);
+    }
+
+    /// <summary>
+    /// Runs propagate from tile (x, y, z).
+    /// </summary>
+    private void PropagateFromSelf(int x, int y, int z)
+    {
+        Propagate(x, y, z, new List<(int, int, int)> { (x, y, z) });
     }
     
     /// <summary>
     /// Core propagate method
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
     /// <param name="initialTiles">The initial tiles to start propagating from.</param>
     /// <exception cref="Exception">if there are no possibilities left. Either due to a bug in code or an error in the tileset.</exception>
     private void Propagate(int x, int y, int z, List<(int x, int y, int z)> initialTiles)
@@ -473,116 +358,32 @@ public class ModelSynthesis
     /// <summary>
     /// Checks if a multi-tile can be placed at the given coordinates.
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <param name="multiTile"></param>
-    /// <returns></returns>
     private bool CanMultiTileBePlaced(int x, int y, int z, Possibility multiTile)
     {
-        bool CheckDirection(int i, int j, int k, Direction d)
+        foreach (var direction in DirectionExtensions.GetDirections())
         {
-            if (!InGrid(i, j, k)) //Handle border
+            foreach (var (nx, ny, nz) in GetNeighbours(x, y, z, multiTile, direction))
             {
-                if (!multiTile.tile.GetAllowed(d, multiTile.rotation).Contains(border))
+                if (!InGrid(nx, ny, nz)) //Handle border
                 {
-                    return false;
-                }
-            }
-            else // Normal tile
-            {
-                if (!multiTile.tile.GetAllowed(d, multiTile.rotation)
-                        .Any(t => possibilities[i, j, k].Select(p => p.tile).Contains(t)))
-                {
-                    return false;
-                }
-
-                if (!possibilities[i, j, k].Any(p =>
-                        p.tile.GetAllowed(d.GetOpposite(), p.rotation).Contains(multiTile.tile)))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        
-        Vector3Int size = multiTile.tile.GetRotatedSize(multiTile.rotation);
-        // Above
-        {
-            int j = y + size.y;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!CheckDirection(i, j, k, Direction.ABOVE)) return false;
-                }
-            }
-        }
-        
-        // Below
-        {
-            int j = y - 1;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!CheckDirection(i, j, k, Direction.BELOW)) return false;
-
-                    if (!InGrid(i, j, k)) continue;
-                    Possibility below = possibilities[i, j, k].First();
-                    if (below.placed && below.tile.sameRotationWhenStacked && below.rotation != multiTile.rotation)
+                    if (!multiTile.tile.GetAllowed(direction, multiTile.rotation).Contains(border))
                     {
                         return false;
                     }
                 }
-            }
-        }
-        
-        // North
-        {
-            int k = z + size.z;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int j = y; j < y + size.y; j++)
+                else // Normal tile
                 {
-                    if (!CheckDirection(i, j, k, Direction.NORTH)) return false;
-                }
-            }
-        }
-        
-        // South
-        {
-            int k = z - 1;
-            for (int i = x; i < x + size.x; i++)
-            {
-                for (int j = y; j < y + size.y; j++)
-                {
-                    if (!CheckDirection(i, j, k, Direction.SOUTH)) return false;
-                }
-            }
-        }
-        
-        // East
-        {
-            int i = x + size.x;
-            for (int j = y; j < y + size.y; j++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!CheckDirection(i, j, k, Direction.EAST)) return false;
-                }
-            }
-        }
-        
-        // West
-        {
-            int i = x - 1;
-            for (int j = y; j < y + size.y; j++)
-            {
-                for (int k = z; k < z + size.z; k++)
-                {
-                    if (!CheckDirection(i, j, k, Direction.WEST)) return false;
+                    if (!multiTile.tile.GetAllowed(direction, multiTile.rotation)
+                            .Any(t => possibilities[nx, ny, nz].Select(p => p.tile).Contains(t)))
+                    {
+                        return false;
+                    }
+
+                    if (!possibilities[nx, ny, nz].Any(p =>
+                            p.tile.GetAllowed(direction.GetOpposite(), p.rotation).Contains(multiTile.tile)))
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -590,9 +391,11 @@ public class ModelSynthesis
         return true;
     }
 
+    /// <summary>
+    /// Returns all posibliites with all rotations for relevant tiles
+    /// </summary>
     private HashSet<Possibility> PossibilitiesFromTiles(HashSet<Tile> tiles)
     {
-        //Returns all posibliites with all rotations for relevant tiles
         HashSet<Possibility> _possibilities = new HashSet<Possibility>();
         foreach (Tile tile in tiles)
         {
@@ -611,6 +414,9 @@ public class ModelSynthesis
         return _possibilities;
     }
 
+    /// <summary>
+    /// Initializes the possibilities array with all possible tiles for each grid point.
+    /// </summary>
     private void InitializePossibilities()
     {
         possibilities = new HashSet<Possibility>[width, height, length];
@@ -625,5 +431,93 @@ public class ModelSynthesis
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Returns coordinates of all neighbours in a given direction. 
+    /// </summary>
+    private List<(int x, int y, int z)> GetNeighbours(int x, int y, int z, Possibility source, Direction direction)
+    {
+        if (!source.tile.IsCustomSize)
+        {
+            (int dx, int dy, int dz) = direction.ToOffset();
+            int nx = x + dx;
+            int ny = y + dy;
+            int nz = z + dz;
+
+            return new List<(int x, int y, int z)> { (nx, ny, nz) };
+        }
+        
+        // Multi tile
+        Vector3Int size = source.tile.GetRotatedSize(source.rotation);
+        var neighbours = new List<(int x, int y, int z)>();
+        
+        if (direction == Direction.ABOVE) {
+            int j = y + size.y;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    neighbours.Add((i, j, k));
+                }
+            }
+        }
+        
+        if (direction == Direction.BELOW) {
+            int j = y - 1;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    neighbours.Add((i, j, k));
+                }
+            }
+        }
+        
+        if (direction == Direction.NORTH) {
+            int k = z + size.z;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int j = y; j < y + size.y; j++)
+                {
+                    neighbours.Add((i, j, k));
+                }
+            }
+        }
+        
+        if (direction == Direction.SOUTH) {
+            int k = z - 1;
+            for (int i = x; i < x + size.x; i++)
+            {
+                for (int j = y; j < y + size.y; j++)
+                {
+                    neighbours.Add((i, j, k));
+                }
+            }
+        }
+        
+        if (direction == Direction.EAST) {
+            int i = x + size.x;
+            for (int j = y; j < y + size.y; j++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    neighbours.Add((i, j, k));
+                }
+            }
+        }
+        
+        if (direction == Direction.WEST) {
+            int i = x - 1;
+            for (int j = y; j < y + size.y; j++)
+            {
+                for (int k = z; k < z + size.z; k++)
+                {
+                    neighbours.Add((i, j, k));
+                }
+            }
+        }
+
+        return neighbours;
     }
 }
