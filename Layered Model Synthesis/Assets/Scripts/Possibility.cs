@@ -17,7 +17,7 @@ public class Possibility
         this.rotation = rotation;
     }
 
-    public Quaternion GetRotation()
+    public Quaternion GetQuaternion()
     {
         return rotation switch
         {
@@ -25,6 +25,7 @@ public class Possibility
             Rotation.ninety => Quaternion.Euler(0, -90, 0),
             Rotation.oneEighty => Quaternion.Euler(0, -180, 0),
             Rotation.twoSeventy => Quaternion.Euler(0, -270, 0),
+            _ => throw new ArgumentOutOfRangeException(nameof(rotation), rotation, null)
         };
     }
     
@@ -36,6 +37,6 @@ public class Possibility
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(tile, (int)rotation);
+        return HashCode.Combine(tile, (int) rotation);
     }
 }
