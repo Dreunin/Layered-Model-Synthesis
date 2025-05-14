@@ -132,21 +132,10 @@ public class SynthesisController : MonoBehaviour
 
     private void ReportPerformance(ModelSynthesis synthesis)
     {
-        synthesis.totalPM.Report();
-        synthesis.initializationPM.Report();        
-        synthesis.massPropagatePM.Report();
-        synthesis.propagatePM.Report();
-        synthesis.propagate2PM.Report();
-        synthesis.constrainPM.Report();
-        synthesis.observePM.Report();
-        synthesis.propagateMultitilePM.Report();
-        synthesis.multiTileFitPM.Report();
-        synthesis.multiTilePlacePM.Report();
-        synthesis.rootInRangePM.Report();
-        synthesis.addToQueuePM.Report();
-        synthesis.propagateNeighboursPM.Report();
-        synthesis.popPM.Report();
-        synthesis.stackPM.Report();
+        PerformanceMeasurement.ReportMultiple(synthesis.totalPM, synthesis.initializationPM, synthesis.observePM,
+            synthesis.massPropagatePM, synthesis.propagatePM, synthesis.constrainPM,
+            synthesis.propagateMultitilePM, synthesis.multiTileFitPM, synthesis.multiTilePlacePM,
+            synthesis.rootInRangePM);
         Debug.Log($"Total tiles propagated: {synthesis.tilesPropagated}");
     }
     

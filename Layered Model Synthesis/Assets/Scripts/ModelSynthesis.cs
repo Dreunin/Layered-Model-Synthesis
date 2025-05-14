@@ -25,19 +25,14 @@ public class ModelSynthesis
     
     public PerformanceMeasurement totalPM = new PerformanceMeasurement("Total");
     public PerformanceMeasurement initializationPM = new PerformanceMeasurement("Initialization");
+    public PerformanceMeasurement observePM = new PerformanceMeasurement("Observe");
     public PerformanceMeasurement massPropagatePM = new PerformanceMeasurement("Mass Propagation");
     public PerformanceMeasurement propagatePM = new PerformanceMeasurement("Propagation");
-    public PerformanceMeasurement propagate2PM = new PerformanceMeasurement("Propagation 2");
     public PerformanceMeasurement constrainPM = new PerformanceMeasurement("Constrain");
-    public PerformanceMeasurement observePM = new PerformanceMeasurement("Observe");
     public PerformanceMeasurement propagateMultitilePM = new PerformanceMeasurement("Multi Tile Propagation");
     public PerformanceMeasurement multiTileFitPM = new PerformanceMeasurement("Multi Tile Fit");
     public PerformanceMeasurement multiTilePlacePM = new PerformanceMeasurement("Multi Tile Place");
     public PerformanceMeasurement rootInRangePM = new PerformanceMeasurement("Root In Range");
-    public PerformanceMeasurement addToQueuePM = new PerformanceMeasurement("Add to Queue");
-    public PerformanceMeasurement propagateNeighboursPM = new PerformanceMeasurement("Propagate Neighbours");
-    public PerformanceMeasurement popPM = new PerformanceMeasurement("Pop");
-    public PerformanceMeasurement stackPM = new PerformanceMeasurement("Stack Initialization");
     public int tilesPropagated = 0;
 
     public ModelSynthesis(Tileset tileset, int width, int length, int height, int seed)
@@ -48,9 +43,7 @@ public class ModelSynthesis
         this.height = height;
         
         random = new Random(seed);
-        initializationPM.Start();
-        InitializePossibilities();
-        initializationPM.Stop();
+        initializationPM.MeasureFunction(InitializePossibilities);;
     }
     
     /// <summary>
@@ -96,9 +89,7 @@ public class ModelSynthesis
     public void Synthesise()
     {
         totalPM.Start();
-        massPropagatePM.Start();
-        MassPropagate();
-        massPropagatePM.Stop();
+        massPropagatePM.MeasureFunction(MassPropagate);
 
         foreach (var (x, y, z) in Util.Iterate3D(width, height, length))
         {
@@ -172,8 +163,6 @@ public class ModelSynthesis
     /// </summary>
     private void PropagateFromNeighbours(int x, int y, int z, Possibility possibility)
     {
-        propagatePM.Start();
-        propagateNeighboursPM.Start();
         var initialTiles = new List<(int x, int y, int z)>();
         foreach (Direction d in DirectionExtensions.GetDirections())
         {
@@ -183,9 +172,8 @@ public class ModelSynthesis
                 initialTiles.Add((nx, ny, nz));
             }
         }
-        propagateNeighboursPM.Stop();
-        Propagate(x, y, z, initialTiles);
-        propagatePM.Stop();
+
+        propagatePM.MeasureFunction(() => Propagate(initialTiles));
     }
 
     /// <summary>
@@ -193,9 +181,7 @@ public class ModelSynthesis
     /// </summary>
     private void PropagateFromSelf(int x, int y, int z)
     {
-        propagatePM.Start();
-        Propagate(x, y, z, new List<(int, int, int)> { (x, y, z) });
-        propagatePM.Stop();
+        propagatePM.MeasureFunction(() => Propagate(new List<(int, int, int)> { (x, y, z) }));
     }
     
     /// <summary>
@@ -203,50 +189,36 @@ public class ModelSynthesis
     /// </summary>
     /// <param name="initialTiles">The initial tiles to start propagating from.</param>
     /// <exception cref="Exception">if there are no possibilities left. Either due to a bug in code or an error in the tileset.</exception>
-    private void Propagate(int x, int y, int z, List<(int x, int y, int z)> initialTiles)
+    private void Propagate(List<(int x, int y, int z)> initialTiles)
     {
-        if (!InGrid(x, y, z)) return;
-        
-        propagate2PM.Start();
-        stackPM.Start();
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>(initialTiles);
-        stackPM.Stop();
-        
-        int originalX = x;
-        int originalY = y;
-        int originalZ = z;
         
         while (q.Count > 0)
         {
-            popPM.Start();
-            (x, y, z) = q.Pop();
-            popPM.Stop();
-            
+            var (x, y, z) = q.Pop();
             tilesPropagated++;
 
             int countBefore = possibilities[x, y, z].Count; // Used to check if we need to propagate again
 
-            constrainPM.Start();
-            ConstrainByNeighbours(x, y, z);
-            constrainPM.Stop();
+            constrainPM.MeasureFunction(() => ConstrainByNeighbours(x, y, z));
             
             // Multi-tile tiles
             propagateMultitilePM.Start();
             foreach (var p in possibilities[x, y, z].Where(p => p.tile.IsCustomSize && p.root))
             {
-                p.root = DoesMultiTileFit(x, y, z, p) && CanMultiTileBePlaced(x, y, z, p);
+                p.root = multiTileFitPM.MeasureFunction(() => DoesMultiTileFit(x, y, z, p)) &&
+                         multiTilePlacePM.MeasureFunction(() => CanMultiTileBePlaced(x, y, z, p));
             }
 
-            possibilities[x, y, z].RemoveWhere(p => p.tile.IsCustomSize && !p.root && !IsRootInRange(x, y, z, p));
+            possibilities[x, y, z].RemoveWhere(p => p.tile.IsCustomSize && !p.root && rootInRangePM.MeasureFunction(() => !IsRootInRange(x, y, z, p)));
+            propagateMultitilePM.Stop();
             
             if (possibilities[x, y, z].Count == 0)
             {
-                throw new Exception($"No possibilities left at ({x}, {y}, {z}). Originally propagating from ({originalX}, {originalY}, {originalZ}).");
+                throw new Exception($"No possibilities left at ({x}, {y}, {z}).");
             }
-            propagateMultitilePM.Stop();
             
             // Check if any possibilities have been removed - if so propagate on neighbours
-            addToQueuePM.Start();
             if (countBefore > possibilities[x, y, z].Count)
             {
                 foreach (Direction d in DirectionExtensions.GetDirections())
@@ -261,9 +233,7 @@ public class ModelSynthesis
                     q.Push((nx, ny, nz));
                 }
             }
-            addToQueuePM.Stop();
         }
-        propagate2PM.Stop();
     }
     
     /// <summary>
@@ -301,7 +271,9 @@ public class ModelSynthesis
                     {
                         allowedByThis.Add(possibility);
                     }
-                    if (possibilities[nx, ny, nz].Select(p => p.tile).Intersect(possibility.tile.GetAllowed(d,possibility.rotation)).Any())
+                    
+                    //if (possibilities[nx, ny, nz].Select(p => p.tile).Intersect(possibility.tile.GetAllowed(d,possibility.rotation)).Any())
+                    if (possibilities[nx, ny, nz].Overlaps(PossibilitiesFromTiles(possibility.tile.GetAllowed(d, possibility.rotation))))
                     {
                         allowedByThis.Add(possibility);
                     }
@@ -337,7 +309,6 @@ public class ModelSynthesis
     /// </summary>
     private bool DoesMultiTileFit(int x, int y, int z, Possibility possibility)
     {
-        multiTileFitPM.Start();
         Vector3Int size = possibility.tile.GetRotatedSize(possibility.rotation);
         foreach (var (i, j, k) in Util.Iterate3D(size))
         {
@@ -345,12 +316,10 @@ public class ModelSynthesis
             if(!InGrid(x + i, y + j, z + k) || !possibilities[x + i, y + j, z + k].Contains(possibility) ||
                IsPlaced(x + i, y + j, z + k))
             {
-                multiTileFitPM.Stop();
                 return false;
             }
         }
 
-        multiTileFitPM.Stop();
         return true;
     }
     
@@ -359,7 +328,6 @@ public class ModelSynthesis
     /// </summary>
     private bool CanMultiTileBePlaced(int x, int y, int z, Possibility possibility)
     {
-        multiTilePlacePM.Start();
         foreach (var direction in DirectionExtensions.GetDirections())
         {
             foreach (var (nx, ny, nz) in GetNeighbours(x, y, z, possibility, direction))
@@ -368,7 +336,6 @@ public class ModelSynthesis
                 {
                     if (!possibility.tile.GetAllowed(direction, possibility.rotation).Contains(border))
                     {
-                        multiTilePlacePM.Stop();
                         return false;
                     }
                 }
@@ -377,21 +344,18 @@ public class ModelSynthesis
                     if (!possibility.tile.GetAllowed(direction, possibility.rotation)
                             .Any(t => possibilities[nx, ny, nz].Select(p => p.tile).Contains(t)))
                     {
-                        multiTilePlacePM.Stop();
                         return false;
                     }
 
                     if (!possibilities[nx, ny, nz].Any(p =>
                             p.tile.GetAllowed(direction.GetOpposite(), p.rotation).Contains(possibility.tile)))
                     {
-                        multiTilePlacePM.Stop();
                         return false;
                     }
                 }
             }
         }
 
-        multiTilePlacePM.Stop();
         return true;
     }
 
@@ -400,18 +364,15 @@ public class ModelSynthesis
     /// </summary>
     private bool IsRootInRange(int x, int y, int z, Possibility possibility)
     {
-        rootInRangePM.Start();
         Vector3Int size = possibility.tile.GetRotatedSize(possibility.rotation);
         foreach (var (i, j, k) in Util.Iterate3D(size))
         {
             if (InGrid(x - i, y - j, z - k) && possibilities[x - i, y - j, z - k].Any(p2 => p2.Equals(possibility) && p2.root))
             {
-                rootInRangePM.Stop();
                 return true;
             }
         }
 
-        rootInRangePM.Stop();
         return false;
     }
 
