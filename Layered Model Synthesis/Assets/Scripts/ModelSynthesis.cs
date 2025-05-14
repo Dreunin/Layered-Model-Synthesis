@@ -192,7 +192,7 @@ public class ModelSynthesis
     private void Propagate(List<(int x, int y, int z)> initialTiles)
     {
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>(initialTiles);
-        //UniqueStack<(int x, int y, int z)> q = new UniqueStack<(int x, int y, int z)>(initialTiles);
+        //UniqueStack<(int x, int y, int z)> q = new UniqueStack<(int x, int y, int z)>(initialTiles); // UniqueStack optimization attempt
         
         while (q.Count > 0)
         {
@@ -230,6 +230,7 @@ public class ModelSynthesis
                     int nz = z + dz;
 
                     if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz)) continue;
+                    //if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz) || q.Contains((nx, ny, nz))) continue; // Queue.Contains optimization attempt
                     
                     q.Push((nx, ny, nz));
                 }
