@@ -163,13 +163,13 @@ public class ModelSynthesis
     /// </summary>
     private void PropagateFromNeighbours(int x, int y, int z, Possibility possibility)
     {
-        var initialTiles = new List<(int x, int y, int z)>();
+        var initialTiles = new List<(int x, int y, int z, Direction)>();
         foreach (Direction d in DirectionExtensions.GetDirections())
         {
             foreach (var (nx, ny, nz) in GetNeighbours(x, y, z, possibility, d))
             {
                 if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz)) continue;
-                initialTiles.Add((nx, ny, nz));
+                initialTiles.Add((nx, ny, nz, d));
             }
         }
 
@@ -181,7 +181,13 @@ public class ModelSynthesis
     /// </summary>
     private void PropagateFromSelf(int x, int y, int z)
     {
-        propagatePM.MeasureFunction(() => Propagate(new List<(int, int, int)> { (x, y, z) }));
+        var initialTiles = new List<(int x, int y, int z, Direction)>();
+        foreach (Direction d in DirectionExtensions.GetDirections())
+        {
+            initialTiles.Add((x, y, z, d));
+        }
+
+        propagatePM.MeasureFunction(() => Propagate(initialTiles));
     }
     
     /// <summary>
@@ -189,19 +195,19 @@ public class ModelSynthesis
     /// </summary>
     /// <param name="initialTiles">The initial tiles to start propagating from.</param>
     /// <exception cref="Exception">if there are no possibilities left. Either due to a bug in code or an error in the tileset.</exception>
-    private void Propagate(List<(int x, int y, int z)> initialTiles)
+    private void Propagate(List<(int x, int y, int z, Direction source)> initialTiles)
     {
-        Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>(initialTiles);
+        var q = new Stack<(int x, int y, int z, Direction source)>(initialTiles);
         //UniqueStack<(int x, int y, int z)> q = new UniqueStack<(int x, int y, int z)>(initialTiles); // UniqueStack optimization attempt
         
         while (q.Count > 0)
         {
-            var (x, y, z) = q.Pop();
+            var (x, y, z, dir) = q.Pop();
             tilesPropagated++;
 
             int countBefore = possibilities[x, y, z].Count; // Used to check if we need to propagate again
 
-            constrainPM.MeasureFunction(() => ConstrainByNeighbours(x, y, z));
+            constrainPM.MeasureFunction(() => ConstrainByNeighbours(x, y, z, dir));
             
             // Multi-tile tiles
             propagateMultitilePM.Start();
@@ -232,7 +238,7 @@ public class ModelSynthesis
                     if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz)) continue;
                     //if (!InGrid(nx, ny, nz) || IsPlaced(nx, ny, nz) || q.Contains((nx, ny, nz))) continue; // Queue.Contains optimization attempt
                     
-                    q.Push((nx, ny, nz));
+                    q.Push((nx, ny, nz, d));
                 }
             }
         }
@@ -241,67 +247,44 @@ public class ModelSynthesis
     /// <summary>
     /// Core propagation check that refines the list of possibilities at (x, y, z) based on the possibilities in the neighbours.
     /// </summary>
-    private void ConstrainByNeighbours(int x, int y, int z)
+    private void ConstrainByNeighbours(int x, int y, int z, Direction source)
     {
-        foreach (Direction d in DirectionExtensions.GetDirections())
-        {
-            (int dx, int dy, int dz) = d.ToOffset();
-            int nx = x + dx;
-            int ny = y + dy;
-            int nz = z + dz;
+        Direction d = source.GetOpposite();
+        
+        (int dx, int dy, int dz) = d.ToOffset();
+        int nx = x + dx;
+        int ny = y + dy;
+        int nz = z + dz;
 
-            if (!InGrid(nx, ny, nz)) // Handle border
+        var current = possibilities[x, y, z];
+
+        if (!InGrid(nx, ny, nz)) // Handle border
+        {
+            current.RemoveWhere(p => !p.tile.GetAllowed(d, p.rotation).Contains(border));
+        }
+        else // Normal tile
+        {
+            var neighbour = possibilities[nx, ny, nz];
+            
+            var allowedByNeighbour =
+                neighbour.SelectMany(p => p.tile.GetAllowed(d.GetOpposite(), p.rotation)).ToHashSet();
+            
+            current.RemoveWhere(p =>
             {
-                HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
-                foreach (var possibility in possibilities[x, y, z])
-                {
-                    if (possibility.tile.GetAllowed(d, possibility.rotation).Contains(border))
-                    {
-                        allowedByThis.Add(possibility);
-                    }
-                }
-                possibilities[x, y, z].IntersectWith(allowedByThis);
-            }
-            else // Normal tile
+                if (p.tile.IsCustomSize && neighbour.Contains(p) && neighbour.Count != 1) 
+                    return false; // Keep because it might be part of the same multitile
+
+                if (!neighbour.Select(n => n.tile).ToHashSet().Overlaps(p.tile.GetAllowed(d, p.rotation)))
+                    return true; // Remove because (x, y, z) does not allow any of the possibilities at (nx, ny, nz)
+                
+                return !allowedByNeighbour.Contains(p.tile); // Remove if (nx, ny, nz) does not allow this possibility
+            });
+            
+            // Enforce above tiles follow below rotation.
+            if (d == Direction.BELOW && IsPlaced(nx, ny, nz) && neighbour.First().tile.sameRotationWhenStacked)
             {
-                // Check if the tile at (x,y,z) allows the tile at (nx,ny,nz)
-                HashSet<Possibility> allowedByThis = new HashSet<Possibility>();
-                foreach (var possibility in possibilities[x, y, z]) 
-                {
-                    if (possibility.tile.IsCustomSize && possibilities[nx, ny, nz].Contains(possibility) &&
-                        possibilities[nx, ny, nz].Count != 1)
-                    {
-                        allowedByThis.Add(possibility);
-                    }
-                    
-                    //if (possibilities[nx, ny, nz].Select(p => p.tile).Intersect(possibility.tile.GetAllowed(d,possibility.rotation)).Any())
-                    if (possibilities[nx, ny, nz].Overlaps(PossibilitiesFromTiles(possibility.tile.GetAllowed(d, possibility.rotation))))
-                    {
-                        allowedByThis.Add(possibility);
-                    }
-                }
-                possibilities[x, y, z].IntersectWith(allowedByThis);
-                
-                // Check if the tile at (nx,ny,nz) allows the tile at (x,y,z)
-                HashSet<Tile> allowedByNeighbour = new HashSet<Tile>();
-                foreach (var possibility in possibilities[nx, ny, nz]) 
-                {
-                    if (possibility.tile.IsCustomSize && possibilities[nx, ny, nz].Count != 1)
-                    {
-                        allowedByNeighbour.Add(possibility.tile);
-                    }
-                    allowedByNeighbour.UnionWith(possibility.tile.GetAllowed(d.GetOpposite(),possibility.rotation));
-                }
-                HashSet<Possibility> allowedByNeighbourPossibilities = PossibilitiesFromTiles(allowedByNeighbour);
-                
-                // Enforce above tiles follow below rotation.
-                if (d == Direction.BELOW && IsPlaced(nx, ny, nz) && possibilities[nx, ny, nz].First().tile.sameRotationWhenStacked)
-                {
-                    allowedByNeighbourPossibilities.RemoveWhere(p =>
-                        p.tile.allowRotation && possibilities[nx, ny, nz].First().rotation != p.rotation);
-                }
-                
-                possibilities[x, y, z].IntersectWith(allowedByNeighbourPossibilities);
+                current.RemoveWhere(p =>
+                    p.tile.allowRotation && neighbour.First().rotation != p.rotation);
             }
         }
     }
@@ -343,8 +326,7 @@ public class ModelSynthesis
                 }
                 else // Normal tile
                 {
-                    if (!possibility.tile.GetAllowed(direction, possibility.rotation)
-                            .Any(t => possibilities[nx, ny, nz].Select(p => p.tile).Contains(t)))
+                    if (!possibility.tile.GetAllowed(direction, possibility.rotation).Overlaps(possibilities[nx, ny, nz].Select(p => p.tile)))
                     {
                         return false;
                     }

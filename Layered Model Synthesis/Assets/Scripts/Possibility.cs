@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// A Possibility is a tile with a rotation that is viable to place at a specific coordinates in the grid. 
 /// </summary>
-public class Possibility 
+public class Possibility : IEquatable<Possibility>
 {
     public Tile tile;
     public Rotation rotation;
@@ -28,7 +28,12 @@ public class Possibility
             _ => throw new ArgumentOutOfRangeException(nameof(rotation), rotation, null)
         };
     }
-    
+
+    public bool Equals(Possibility other)
+    {
+        return other is not null && tile == other.tile && rotation == other.rotation;
+    }
+
     public override bool Equals(object obj)
     {
         if (obj is not Possibility other) return false;
