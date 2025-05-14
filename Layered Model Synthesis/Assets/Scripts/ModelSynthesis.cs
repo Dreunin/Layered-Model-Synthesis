@@ -192,6 +192,7 @@ public class ModelSynthesis
     private void Propagate(List<(int x, int y, int z)> initialTiles)
     {
         Stack<(int x, int y, int z)> q = new Stack<(int x, int y, int z)>(initialTiles);
+        //UniqueStack<(int x, int y, int z)> q = new UniqueStack<(int x, int y, int z)>(initialTiles);
         
         while (q.Count > 0)
         {

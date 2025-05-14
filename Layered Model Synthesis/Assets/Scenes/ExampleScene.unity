@@ -50154,7 +50154,7 @@ MonoBehaviour:
   width: 10
   length: 10
   height: 5
-  seed: 0
+  seed: -2145238340
   roomContainer: {fileID: 1134953458}
   roomHandlingMode: 2
   preplacedTilesContainer: {fileID: 0}
