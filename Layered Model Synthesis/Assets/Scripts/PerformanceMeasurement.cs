@@ -11,9 +11,11 @@ public class PerformanceMeasurement
 {
     public string name;
     
-    private List<float> measurements = new();
+    private List<long> measurements = new();
     private Stopwatch stopwatch = new();
     private CustomSampler sampler;
+
+    private static double TicksPerMS = Stopwatch.Frequency / 1000.0;
     
     public PerformanceMeasurement(string name)
     {
@@ -31,7 +33,7 @@ public class PerformanceMeasurement
     {
         sampler.End();
         stopwatch.Stop();
-        measurements.Add(stopwatch.ElapsedMilliseconds);
+        measurements.Add(stopwatch.ElapsedTicks);
     }
 
     public void MeasureFunction(Action action)
@@ -93,27 +95,27 @@ public class PerformanceMeasurement
         Debug.Log(sb);
     }
 
-    private float Total() => measurements.Sum();
-    private float Min() => measurements.Min();
-    private float Max() => measurements.Max();
-    private float Mean() => measurements.Average();
+    private double Total() => measurements.Sum() / TicksPerMS;
+    private double Min() => measurements.Min() / TicksPerMS;
+    private double Max() => measurements.Max() / TicksPerMS;
+    private double Mean() => measurements.Average() / TicksPerMS;
     private int Count => measurements.Count;
 
-    private float? Median()
+    private double? Median()
     {
         if (Count == 0) return null;
 
         if (Count % 2 == 0)
-            return measurements.OrderBy(x => x).Skip((Count / 2) - 1).Take(2).Average();
+            return measurements.OrderBy(x => x).Skip((Count / 2) - 1).Take(2).Average() / TicksPerMS;
         else
-            return measurements.OrderBy(x => x).ElementAt(Count / 2);
+            return measurements.OrderBy(x => x).ElementAt(Count / 2) / TicksPerMS;
     }
 
-    private float? StdDev()
+    private double? StdDev()
     {
         if (Count == 0) return null;
         
-        float mean = Mean();
-        return Mathf.Sqrt(measurements.Sum(x => (x - mean) * (x - mean)) / Count);
+        double mean = Mean();
+        return Math.Sqrt(measurements.Sum(x => (x - mean) * (x - mean)) / Count) / TicksPerMS;
     }
 }
