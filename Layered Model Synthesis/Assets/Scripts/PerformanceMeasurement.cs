@@ -66,13 +66,13 @@ public class PerformanceMeasurement
         var nameLength = Math.Max(measurements.Max(m => m.name.Length), 11);
         var countLength = Math.Max(measurements.Max(m => m.Count).ToString().Length, 5);
 
-        var totals = measurements.Select(m => m.Total().ToString("g5")).ToArray();
-        var means = measurements.Select(m => m.Mean().ToString("g5")).ToArray();
-        var mins = measurements.Select(m => m.Min().ToString("g5")).ToArray();
-        var maxs = measurements.Select(m => m.Max().ToString("g5")).ToArray();
+        var totals = measurements.Select(m => m.Count > 0 ? m.Total().ToString("g5") : "-").ToArray();
+        var means = measurements.Select(m => m.Count > 0 ? m.Mean().ToString("g5") : "-").ToArray();
+        var mins = measurements.Select(m => m.Count > 0 ? m.Min().ToString("g5") : "-").ToArray();
+        var maxs = measurements.Select(m => m.Count > 0 ? m.Max().ToString("g5") : "-").ToArray();
         // ReSharper disable PossibleInvalidOperationException
-        var medians = measurements.Select(m => m.Median().Value.ToString("g5")).ToArray();
-        var stddevs = measurements.Select(m => m.StdDev().Value.ToString("g5")).ToArray();
+        var medians = measurements.Select(m => m.Count > 0 ? m.Median().Value.ToString("g5") : "-").ToArray();
+        var stddevs = measurements.Select(m => m.Count > 0 ? m.StdDev().Value.ToString("g5") : "-").ToArray();
         // ReSharper restore PossibleInvalidOperationException
 
         var totalLength = Math.Max(totals.Max(m => m.Length), 5);
