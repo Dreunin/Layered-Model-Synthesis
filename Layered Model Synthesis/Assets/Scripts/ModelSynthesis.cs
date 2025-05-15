@@ -266,15 +266,23 @@ public class ModelSynthesis
         {
             var neighbour = possibilities[nx, ny, nz];
             
-            var allowedByNeighbour =
-                neighbour.SelectMany(p => p.tile.GetAllowed(d.GetOpposite(), p.rotation)).ToHashSet();
+            var allowedByNeighbour = new HashSet<Tile>();
+            foreach (var p in neighbour)
+            {
+                foreach (var allowed in p.tile.GetAllowed(d.GetOpposite(), p.rotation))
+                {
+                    allowedByNeighbour.Add(allowed);
+                }
+            }
+            
+            var neighbourTiles = neighbour.Select(n => n.tile).ToHashSet();
             
             current.RemoveWhere(p =>
             {
                 if (p.tile.IsCustomSize && neighbour.Contains(p) && neighbour.Count != 1) 
                     return false; // Keep because it might be part of the same multitile
 
-                if (!neighbour.Select(n => n.tile).ToHashSet().Overlaps(p.tile.GetAllowed(d, p.rotation)))
+                if (!neighbourTiles.Overlaps(p.tile.GetAllowed(d, p.rotation)))
                     return true; // Remove because (x, y, z) does not allow any of the possibilities at (nx, ny, nz)
                 
                 return !allowedByNeighbour.Contains(p.tile); // Remove if (nx, ny, nz) does not allow this possibility
