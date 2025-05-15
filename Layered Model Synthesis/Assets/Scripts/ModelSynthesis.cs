@@ -13,7 +13,7 @@ public class ModelSynthesis
     private int length;
     private int height;
 
-    private HashSet<Possibility>[,,] possibilities;
+    public HashSet<Possibility>[,,] possibilities;
 
     private List<Tile> tiles => tileset.Tiles;
     private Tile border => tileset.Border;
@@ -43,7 +43,7 @@ public class ModelSynthesis
         this.height = height;
         
         random = new Random(seed);
-        initializationPM.MeasureFunction(InitializePossibilities);;
+        initializationPM.MeasureFunction(InitializePossibilities);
     }
     
     /// <summary>
@@ -86,10 +86,11 @@ public class ModelSynthesis
     /// <summary>
     /// Synthesises the model by iterating through each tile in the grid and placing possible tiles to create a scene
     /// </summary>
-    public void Synthesise()
+    public void Synthesise(bool massPropagate = true)
     {
         totalPM.Start();
-        massPropagatePM.MeasureFunction(MassPropagate);
+        if (massPropagate)
+            massPropagatePM.MeasureFunction(MassPropagate);
 
         foreach (var (x, y, z) in Util.Iterate3D(width, height, length))
         {
@@ -115,7 +116,7 @@ public class ModelSynthesis
     /// <summary>
     /// Initial propagation over the entire grid
     /// </summary>
-    private void MassPropagate()
+    public void MassPropagate()
     {
         foreach (var (x, y, z) in Util.Iterate3D(width, height, length))
         {

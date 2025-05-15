@@ -19,6 +19,7 @@ public class SynthesisController_Inspector : Editor
         };
         buttonsContainer.Add(CreateSeededSynthesiseButton());
         buttonsContainer.Add(CreateUnseededSynthesiseButton());
+        buttonsContainer.Add(CreateSynthesiseManyButton());
         
         root.Add(buttonsContainer);
         
@@ -40,6 +41,14 @@ public class SynthesisController_Inspector : Editor
         {
             int seed = (int) DateTime.Now.Ticks;
             (target as SynthesisController)?.BeginSynthesis(seed);
+        });
+    }
+    
+    private VisualElement CreateSynthesiseManyButton()
+    {
+        return CreateButton("Synthesise Many", () =>
+        {
+            (target as SynthesisController)?.SynthesizeMany();
         });
     }
 

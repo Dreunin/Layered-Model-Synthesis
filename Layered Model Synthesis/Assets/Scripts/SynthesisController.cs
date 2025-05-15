@@ -109,6 +109,59 @@ public class SynthesisController : MonoBehaviour
         }).Start();
     }
 
+    public void SynthesizeMany()
+    {
+        int _width = 5;
+        int _length = 5;
+        
+        IEnumerator CreateRoom(ModelSynthesis massPropagater)
+        {
+            for (var x = 0; x < _width; x++)
+            {
+                for (var z = 0; z < _length; z++)
+                {
+                    var room = new GameObject($"Room {seed}").transform;
+                    room.position = new Vector3(x * (width + 3), 0, z * (length + 3));
+                    room.SetParent(roomContainer);
+                
+                    var modelSynthesis = new ModelSynthesis(tileset, width, length, height, (int) DateTime.Now.Ticks);
+                
+                    modelSynthesis.possibilities = new HashSet<Possibility>[width,height,length];
+                    foreach (var (i, j, k) in Util.Iterate3D(width, height, length))
+                    {
+                        modelSynthesis.possibilities[i,j,k] = new HashSet<Possibility>();
+                        foreach (var possibility in massPropagater.possibilities[i,j,k])
+                        {
+                            modelSynthesis.possibilities[i,j,k].Add(new Possibility(possibility.tile, possibility.rotation));
+                        }
+                    }
+                
+                    modelSynthesis.OnPlaceTile += (position, possibility) => AddTask(InstantiateTile(position, possibility, room));
+                    modelSynthesis.OnFinish += () =>
+                    {
+                        if(animationMode == AnimationMode.AnimateOnCompletion) AddTask(AnimatePlaceTiles(room));
+                        ReportPerformance(modelSynthesis);
+                    };
+                
+                    new Thread(() =>
+                    {
+                        Thread.CurrentThread.IsBackground = true;
+                        modelSynthesis.Synthesise(false);
+                    }).Start();
+
+                    yield return null;
+                }
+            }
+        }
+
+        new Thread(() =>
+        {
+            var massPropagater = new ModelSynthesis(tileset, width, length, height, 0);
+            massPropagater.MassPropagate();
+            AddTask(CreateRoom(massPropagater));
+        }).Start();
+    }
+
     /// <summary>
     /// Finds all preplaced tiles in the preplacedTilesContainer and places them in the possibilities grid.
     /// </summary>
@@ -154,7 +207,7 @@ public class SynthesisController : MonoBehaviour
         }
         Transform layer = room.GetChild(position.y);
         
-        Vector3 placement = position + new Vector3(possibility.tile.GetRotatedSize(possibility.rotation).x-1,0, possibility.tile.GetRotatedSize(possibility.rotation).z-1) / 2f;
+        Vector3 placement = position + new Vector3(possibility.tile.GetRotatedSize(possibility.rotation).x-1,0, possibility.tile.GetRotatedSize(possibility.rotation).z-1) / 2f + room.position;
         Tile newTile = Instantiate(possibility.tile, placement, possibility.GetQuaternion());
         newTile.transform.SetParent(layer);
         if (possibility.tile.allowFreeRotation) newTile.transform.eulerAngles = new Vector3(0, Random.Range(0,360), 0);
